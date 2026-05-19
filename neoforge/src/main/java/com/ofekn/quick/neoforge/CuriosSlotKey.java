@@ -19,7 +19,7 @@ public record CuriosSlotKey(String identifier, int index) implements ISlotKey {
             ByteBufCodecs.VAR_INT, CuriosSlotKey::index,
             CuriosSlotKey::new
     );
-    public static final SlotType<CuriosSlotKey> TYPE = new SlotType<>("curios", STREAM_CODEC);
+    public static final SlotType<CuriosSlotKey> TYPE = new SlotType<>(STREAM_CODEC);
 
     @Override
     public SlotType<?> type() {

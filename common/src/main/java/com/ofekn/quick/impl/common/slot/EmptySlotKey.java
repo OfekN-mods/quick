@@ -11,7 +11,7 @@ public enum EmptySlotKey implements ISlotKey {
     INSTANCE;
 
     public static final StreamCodec<ByteBuf, EmptySlotKey> STREAM_CODEC = StreamCodec.unit(INSTANCE);
-    public static final SlotType<EmptySlotKey> TYPE = new SlotType<>("empty", STREAM_CODEC);
+    public static final SlotType<EmptySlotKey> TYPE = new SlotType<>(STREAM_CODEC);
 
     @Override
     public SlotType<?> type() {

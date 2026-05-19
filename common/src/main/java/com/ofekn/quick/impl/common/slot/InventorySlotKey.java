@@ -13,7 +13,7 @@ public record InventorySlotKey(int index) implements ISlotKey {
             ByteBufCodecs.VAR_INT, InventorySlotKey::index,
             InventorySlotKey::new
     );
-    public static final SlotType<InventorySlotKey> TYPE = new SlotType<>("inventory", STREAM_CODEC);
+    public static final SlotType<InventorySlotKey> TYPE = new SlotType<>(STREAM_CODEC);
 
     public InventorySlotKey {
         if (index < 0) {
