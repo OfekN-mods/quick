@@ -1,15 +1,31 @@
 package com.ofekn.quick.impl.slot;
 
 import com.ofekn.quick.api.ISlotKey;
+import com.ofekn.quick.api.SlotType;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+import java.lang.reflect.Type;
+
 public record InventorySlotKey(int index) implements ISlotKey {
+    public static final StreamCodec<ByteBuf, InventorySlotKey> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, InventorySlotKey::index,
+            InventorySlotKey::new
+    );
+    public static final SlotType<InventorySlotKey> TYPE = new SlotType<>(STREAM_CODEC);
 
     public InventorySlotKey {
         if (index < 0) {
             throw new IllegalArgumentException("index must be positive");
         }
+    }
+
+    @Override
+    public SlotType<?> type() {
+        return TYPE;
     }
 
     @Override

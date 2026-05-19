@@ -1,6 +1,8 @@
 package com.ofekn.quick.integration;
 
+import net.minecraft.core.Registry;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceKey;
 
 public interface IPlatformIntegration {
 
@@ -35,7 +37,23 @@ public interface IPlatformIntegration {
         return isDevelopmentEnvironment() ? "development" : "production";
     }
 
-    void sendPacketToServer(CustomPacketPayload payload);
 
+    /**
+     * Registers a new registry
+     *
+     * @param key the id of the new registry
+     * @return the new registry
+     */
+    <T> Registry<T> makeRegistry(ResourceKey<Registry<T>> key);
+
+
+    /**
+     * Creates a registrar
+     *
+     * @return A platform specific registrar
+     */
+    <T> Registrar<T> createRegistrar(Registry<T> registry);
+
+    void sendPacketToServer(CustomPacketPayload payload);
     IConfigIntegration getConfigIntegration();
 }

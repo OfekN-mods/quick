@@ -1,7 +1,11 @@
 package com.ofekn.quick;
 
 import com.ofekn.quick.api.QuickApi;
+import com.ofekn.quick.api.QuickRegistry;
+import com.ofekn.quick.impl.slot.ContainerSlotKey;
+import com.ofekn.quick.impl.slot.EmptySlotKey;
 import com.ofekn.quick.impl.slot.InventorySlotKey;
+import com.ofekn.quick.integration.CoasIntegrations;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -23,5 +27,10 @@ public final class Quick {
             int inventorySize = player.getInventory().getContainerSize();
             return IntStream.range(0, inventorySize).mapToObj(InventorySlotKey::new);
         });
+
+        var slotTypeRegistrar = CoasIntegrations.PLATFORM.createRegistrar(QuickRegistry.SLOT_TYPE);
+        slotTypeRegistrar.register("empty", () -> EmptySlotKey.TYPE);
+        slotTypeRegistrar.register("inventory", () -> InventorySlotKey.TYPE);
+        slotTypeRegistrar.register("container", () -> ContainerSlotKey.TYPE);
     }
 }

@@ -1,6 +1,9 @@
 package com.ofekn.quick.neoforge;
 
 import com.ofekn.quick.api.QuickApi;
+import com.ofekn.quick.api.QuickRegistry;
+import com.ofekn.quick.impl.slot.EmptySlotKey;
+import com.ofekn.quick.integration.CoasIntegrations;
 import net.minecraft.world.entity.player.Player;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -15,6 +18,9 @@ final class CuriosIntegration {
 
     public static void register() {
         QuickApi.registerSlotAccess(CuriosIntegration::provide);
+
+        var slotTypeRegistrar = CoasIntegrations.PLATFORM.createRegistrar(QuickRegistry.SLOT_TYPE);
+        slotTypeRegistrar.register("curios", () -> EmptySlotKey.TYPE);
     }
 
     private static Stream<CuriosSlotKey> provide(Player player) {

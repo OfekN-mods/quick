@@ -1,6 +1,10 @@
 package com.ofekn.quick.neoforge;
 
 import com.ofekn.quick.api.ISlotKey;
+import com.ofekn.quick.api.SlotType;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -10,6 +14,18 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import java.util.Optional;
 
 public record CuriosSlotKey(String identifier, int index) implements ISlotKey {
+    public static final StreamCodec<ByteBuf, CuriosSlotKey> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8, CuriosSlotKey::identifier,
+            ByteBufCodecs.VAR_INT, CuriosSlotKey::index,
+            CuriosSlotKey::new
+    );
+    public static final SlotType<CuriosSlotKey> TYPE = new SlotType<>(STREAM_CODEC);
+
+    @Override
+    public SlotType<?> type() {
+        return TYPE;
+    }
+
     @Override
     public ItemStack get(Player player) {
         return getStackHandler(player)

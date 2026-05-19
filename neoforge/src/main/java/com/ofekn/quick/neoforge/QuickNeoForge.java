@@ -43,6 +43,7 @@ public class QuickNeoForge {
         }
 
         NeoForgeConfigIntegration.register(modContainer);
+        NeoForgeIntegration.supplyModBus(bus);
     }
 
     private <I extends Item> void registerItem(DeferredRegister.Items itemsReg, CoasItem<I> item) {

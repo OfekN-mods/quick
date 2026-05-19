@@ -1,5 +1,8 @@
 package com.ofekn.quick.api;
 
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -11,6 +14,13 @@ import net.minecraft.world.item.ItemStack;
  *  - 2nd slot of the menu
  */
 public interface ISlotKey {
+    StreamCodec<RegistryFriendlyByteBuf, ISlotKey> STREAM_CODEC = ByteBufCodecs.registry(QuickRegistryKeys.SLOT_TYPE)
+            .dispatch(ISlotKey::type, SlotType::streamCodec);
+    /**
+     * @return the type of this slot
+     */
+    SlotType<?> type();
+
     /**
      * @param player the container
      * @return the item in this slot
