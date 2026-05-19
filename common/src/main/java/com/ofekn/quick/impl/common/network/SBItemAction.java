@@ -4,6 +4,7 @@ import com.ofekn.quick.api.common.IItemAction;
 import com.ofekn.quick.api.common.ISlotKey;
 import com.ofekn.quick.api.common.IWheelItem;
 import com.ofekn.quick.api.common.QuickDataComponents;
+import com.ofekn.quick.api.common.QuickRegistryKeys;
 import com.ofekn.quick.impl.common.Quick;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -32,6 +33,11 @@ public record SBItemAction(ISlotKey key) implements CustomPacketPayload {
         IItemAction action = stack.get(QuickDataComponents.ITEM_ACTION);
         if (action != null) {
             action.onItemAction(player, key);
+            return;
         }
+        player.level().registryAccess().lookupOrThrow(QuickRegistryKeys.ACTION).stream()
+                .filter(qa -> qa.item().test(stack))
+                .findFirst()
+                .ifPresent(qa -> qa.action().onItemAction(player, key));
     }
 }

@@ -9,10 +9,12 @@ import com.ofekn.quick.api.client.IWheelOption;
 import com.ofekn.quick.api.client.QuickClientApi;
 import com.ofekn.quick.api.client.WheelData;
 import com.ofekn.quick.api.common.QuickDataComponents;
+import com.ofekn.quick.api.common.QuickRegistryKeys;
 import com.ofekn.quick.impl.client.layout.ListWheelLayout;
 import com.ofekn.quick.impl.client.layout.RoundWheelLayout;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import com.ofekn.quick.impl.common.network.SBItemAction;
+import net.minecraft.core.Registry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -116,11 +118,16 @@ public final class QuickClient {
     }
 
     public static List<ISlotKey> getOptions(Player player) {
+        Registry<com.ofekn.quick.impl.common.datapack.QuickAction> actionRegistry =
+                player.level().registryAccess().lookupOrThrow(QuickRegistryKeys.ACTION);
+
         List<ISlotKey> allOptions = QuickApi.getSlots(player)
                 .stream()
                 .filter(key -> {
                     ItemStack stack = key.get(player);
-                    return stack.getItem() instanceof IWheelItem || stack.has(QuickDataComponents.ITEM_ACTION);
+                    if (stack.getItem() instanceof IWheelItem) return true;
+                    if (stack.has(QuickDataComponents.ITEM_ACTION)) return true;
+                    return actionRegistry.stream().anyMatch(qa -> qa.item().test(stack));
                 })
                 .toList();
 

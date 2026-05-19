@@ -1,10 +1,13 @@
 package com.ofekn.quick.fabric;
 
+import com.ofekn.quick.api.common.QuickRegistryKeys;
 import com.ofekn.quick.impl.common.Quick;
+import com.ofekn.quick.impl.common.datapack.QuickAction;
 import com.ofekn.quick.item.CoasItem;
 import com.ofekn.quick.impl.common.network.SBItemAction;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Registry;
@@ -22,6 +25,7 @@ public class QuickFabric implements ModInitializer {
         Quick.init();
         registerItems();
         registerPackets();
+        registerDatapackRegistries();
         GsonConfigIntegration.load();
     }
 
@@ -55,5 +59,9 @@ public class QuickFabric implements ModInitializer {
     private void registerPackets() {
         PayloadTypeRegistry.serverboundPlay().register(SBItemAction.TYPE, SBItemAction.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(SBItemAction.TYPE, (payload, context) -> payload.handle(context.player()));
+    }
+
+    private void registerDatapackRegistries() {
+        DynamicRegistries.registerSynced(QuickRegistryKeys.ACTION, QuickAction.CODEC, QuickAction.CODEC);
     }
 }

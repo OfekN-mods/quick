@@ -1,9 +1,12 @@
 package com.ofekn.quick.neoforge;
 
+import com.ofekn.quick.api.common.QuickRegistryKeys;
 import com.ofekn.quick.impl.common.Quick;
+import com.ofekn.quick.impl.common.datapack.QuickAction;
 import com.ofekn.quick.impl.common.network.SBItemAction;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
@@ -15,6 +18,11 @@ final class QuickEvents {
     public static void register(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar("1");
         registrar.playToServer(SBItemAction.TYPE, SBItemAction.CODEC, (packet, ctx) -> packet.handle(ctx.player()));
+    }
+
+    @SubscribeEvent
+    public static void newRegistry(DataPackRegistryEvent.NewRegistry event) {
+        event.dataPackRegistry(QuickRegistryKeys.ACTION, QuickAction.CODEC, QuickAction.CODEC);
     }
 
 

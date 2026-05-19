@@ -1,0 +1,6 @@
+{
+  "item": "#quick:simple_action",
+  "action": {
+    "type": "quick:use"
+  }
+}
