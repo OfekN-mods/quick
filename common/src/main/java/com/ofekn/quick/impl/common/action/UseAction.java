@@ -3,6 +3,7 @@ package com.ofekn.quick.impl.common.action;
 import com.mojang.serialization.MapCodec;
 import com.ofekn.quick.api.common.ISlotKey;
 import com.ofekn.quick.api.common.IItemAction;
+import com.ofekn.quick.impl.common.slot.InventorySlotKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -21,6 +22,19 @@ public enum UseAction implements IItemAction {
 
     @Override
     public void onItemAction(Player player, ISlotKey slot) {
+        if (slot instanceof InventorySlotKey(int index) && index == player.getInventory().getSelectedSlot()) {
+            ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+            InteractionResult result = stack.use(player.level(), player, InteractionHand.MAIN_HAND);
+            if (result instanceof InteractionResult.Success success) {
+                ItemStack transform = success.heldItemTransformedTo();
+                if (transform != null) {
+                    player.setItemInHand(InteractionHand.MAIN_HAND, transform);
+                }
+            }
+            return;
+        }
+
+
         ItemStack temp = player.getItemInHand(InteractionHand.MAIN_HAND);
         ItemStack stack = slot.get(player);
         if (!slot.set(player, ItemStack.EMPTY)) {
@@ -35,7 +49,7 @@ public enum UseAction implements IItemAction {
         if (transform == null) {
             transform = player.getItemInHand(InteractionHand.MAIN_HAND);
         }
-        player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+        player.setItemInHand(InteractionHand.MAIN_HAND, temp);
         if (slot.set(player, transform)) {
             return;
         }

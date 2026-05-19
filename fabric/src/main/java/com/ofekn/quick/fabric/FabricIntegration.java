@@ -6,6 +6,7 @@ import com.ofekn.quick.impl.common.integration.IPlatformIntegration;
 import com.ofekn.quick.impl.common.integration.Registrar;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -14,7 +15,6 @@ import net.minecraft.resources.ResourceKey;
 import java.util.function.Supplier;
 
 public class FabricIntegration implements IPlatformIntegration {
-
     @Override
     public String getPlatformName() {
         return "Fabric";
@@ -31,8 +31,10 @@ public class FabricIntegration implements IPlatformIntegration {
     }
 
     @Override
-    public <T> Registry<T> makeRegistry(ResourceKey<Registry<T>> key) {
-        return FabricRegistryBuilder.create(key).buildAndRegister();
+    public <T> Registry<T> makeRegistry(ResourceKey<Registry<T>> key, boolean sync) {
+        var builder = FabricRegistryBuilder.create(key);
+        if (sync) builder = builder.attribute(RegistryAttribute.SYNCED);
+        return builder.buildAndRegister();
     }
 
     @Override

@@ -2,19 +2,17 @@ package com.ofekn.quick.impl.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.ofekn.quick.api.client.QuickClientRegistry;
+import com.ofekn.quick.api.common.ISlotKey;
 import com.ofekn.quick.api.common.IWheelItem;
 import com.ofekn.quick.api.common.QuickApi;
 import com.ofekn.quick.api.client.IWheelOption;
 import com.ofekn.quick.api.client.QuickClientApi;
 import com.ofekn.quick.api.client.WheelData;
-import com.ofekn.quick.api.common.QuickRegistry;
+import com.ofekn.quick.api.common.QuickDataComponents;
 import com.ofekn.quick.impl.client.layout.ListWheelLayout;
 import com.ofekn.quick.impl.client.layout.RoundWheelLayout;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
-import com.ofekn.quick.impl.common.network.SBOpen;
-import com.ofekn.quick.impl.common.slot.ContainerSlotKey;
-import com.ofekn.quick.impl.common.slot.EmptySlotKey;
-import com.ofekn.quick.impl.common.slot.InventorySlotKey;
+import com.ofekn.quick.impl.common.network.SBItemAction;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -61,42 +59,20 @@ public final class QuickClient {
 
     private static ItemStack lastSelection = ItemStack.EMPTY;
     public static void trigger(Minecraft minecraft, Player player) {
-        List<ItemStack> options = getOptions(player);
+        List<ISlotKey> options = getOptions(player);
         if (options.isEmpty()) {
             return;
         }
-        ItemStack firstOption = options.getFirst();
         if (options.size() == 1 || !QuickKeyMappings.get().wheel.isDown()) {
-            QuickIntegrations.PLATFORM.sendPacketToServer(new SBOpen(firstOption));
+            QuickIntegrations.PLATFORM.sendPacketToServer(new SBItemAction(options.getFirst()));
             return;
         }
         QuickClientApi.openWheel(new WheelData() {
             @Override
             public List<IWheelOption> options() {
-                return options.stream().<IWheelOption>map(stack -> new IWheelOption() {
-                    @Override
-                    public void onSelect() {
-                        lastSelection = stack;
-                        QuickIntegrations.PLATFORM.sendPacketToServer(new SBOpen(stack));
-                    }
-
-                    @Override
-                    public void extract(GuiGraphicsExtractor graphics) {
-                        graphics.fakeItem(stack, -8, -8);
-                    }
-
-                    @Override
-                    public void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
-                        graphics.setTooltipForNextFrame(
-                                minecraft.font,
-                                Screen.getTooltipFromItem(minecraft, stack),
-                                stack.getTooltipImage(),
-                                mouseX,
-                                mouseY,
-                                stack.get(DataComponents.TOOLTIP_STYLE)
-                        );
-                    }
-                }).toList();
+                return options.stream()
+                        .map(key -> (IWheelOption)new SlotWheelOption(minecraft, player, key, key.get(player)))
+                        .toList();
             }
 
             @Override
@@ -104,6 +80,31 @@ public final class QuickClient {
                 return isWheelButtonDown(minecraft) ? Status.SELECTING : Status.FINISH_SELECT;
             }
         });
+    }
+
+    private record SlotWheelOption(Minecraft minecraft, Player player, ISlotKey key, ItemStack stack) implements IWheelOption {
+        @Override
+        public void onSelect() {
+            lastSelection = stack;
+            QuickIntegrations.PLATFORM.sendPacketToServer(new SBItemAction(key));
+        }
+
+        @Override
+        public void extract(GuiGraphicsExtractor graphics) {
+            graphics.fakeItem(stack, -8, -8);
+        }
+
+        @Override
+        public void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+            graphics.setTooltipForNextFrame(
+                    minecraft.font,
+                    Screen.getTooltipFromItem(minecraft, stack),
+                    stack.getTooltipImage(),
+                    mouseX,
+                    mouseY,
+                    stack.get(DataComponents.TOOLTIP_STYLE)
+            );
+        }
     }
 
     private static boolean isWheelButtonDown(Minecraft minecraft) {
@@ -114,33 +115,34 @@ public final class QuickClient {
         return InputConstants.isKeyDown(window, key.getValue());
     }
 
-    public static List<ItemStack> getOptions(Player player) {
-        List<ItemStack> allOptions = QuickApi.getSlots(player)
+    public static List<ISlotKey> getOptions(Player player) {
+        List<ISlotKey> allOptions = QuickApi.getSlots(player)
                 .stream()
-                .map(key -> key.get(player))
-                .map(stack -> stack.getItem() instanceof IWheelItem item ? item.getWheelRepresentative(player, stack) : ItemStack.EMPTY)
-                .filter(stack -> !stack.isEmpty())
+                .filter(key -> {
+                    ItemStack stack = key.get(player);
+                    return stack.getItem() instanceof IWheelItem || stack.has(QuickDataComponents.ITEM_ACTION);
+                })
                 .toList();
 
-        // Deduplicate using ItemStack.isSameItemSameComponents
-        List<ItemStack> result = new ArrayList<>();
-        for (ItemStack stack : allOptions) {
+        List<ISlotKey> result = new ArrayList<>();
+        for (ISlotKey key : allOptions) {
+            ItemStack stack = key.get(player);
             boolean isDuplicate = false;
-            for (ItemStack existing : result) {
-                if (ItemStack.isSameItemSameComponents(stack, existing)) {
+            for (ISlotKey existing : result) {
+                if (ItemStack.isSameItemSameComponents(existing.get(player), stack)) {
                     isDuplicate = true;
                     break;
                 }
             }
             if (!isDuplicate) {
-                result.add(stack);
+                result.add(key);
             }
         }
 
         for (int i = 0; i < result.size(); i++) {
-            if (ItemStack.isSameItemSameComponents(result.get(i), lastSelection)) {
-                result.remove(i);
-                result.addFirst(lastSelection);
+            if (ItemStack.isSameItemSameComponents(result.get(i).get(player), lastSelection)) {
+                ISlotKey key = result.remove(i);
+                result.addFirst(key);
                 break;
             }
         }

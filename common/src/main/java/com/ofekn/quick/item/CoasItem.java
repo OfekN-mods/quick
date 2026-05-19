@@ -239,12 +239,7 @@ public final class CoasItem<I extends Item> implements Supplier<I> {
                 }
             }
         };
-        return createItem(block, (props) -> new ItemOnAStick(props, block, "repair", builder) {
-            @Override
-            public ItemStack getWheelRepresentative(Player player, ItemStack stack) {
-                return stack.transmuteCopy(ANVIL.get(), 1);
-            }
-        }, CoasItem::itemOnAStickProperties);
+        return createItem(block, (props) -> new ItemOnAStick(props, block, "repair", builder), CoasItem::itemOnAStickProperties);
     }
 
 

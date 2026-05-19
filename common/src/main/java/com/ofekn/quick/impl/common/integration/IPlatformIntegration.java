@@ -41,10 +41,11 @@ public interface IPlatformIntegration {
     /**
      * Registers a new registry
      *
-     * @param key the id of the new registry
+     * @param key  the id of the new registry
+     * @param sync whether the registry should have a sync flag
      * @return the new registry
      */
-    <T> Registry<T> makeRegistry(ResourceKey<Registry<T>> key);
+    <T> Registry<T> makeRegistry(ResourceKey<Registry<T>> key, boolean sync);
 
 
     /**

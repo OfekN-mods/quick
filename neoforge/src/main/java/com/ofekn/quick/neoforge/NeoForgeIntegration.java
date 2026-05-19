@@ -1,6 +1,5 @@
 package com.ofekn.quick.neoforge;
 
-import com.mojang.logging.LogUtils;
 import com.ofekn.quick.impl.common.Quick;
 import com.ofekn.quick.impl.common.integration.IConfigIntegration;
 import com.ofekn.quick.impl.common.integration.IPlatformIntegration;
@@ -8,23 +7,14 @@ import com.ofekn.quick.impl.common.integration.Registrar;
 import net.minecraft.core.Registry;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class NeoForgeIntegration implements IPlatformIntegration {
-    private static final Logger LOG = LogUtils.getLogger();
-
     @Override
     public String getPlatformName() {
         return "NeoForge";
@@ -41,10 +31,10 @@ public class NeoForgeIntegration implements IPlatformIntegration {
     }
 
     @Override
-    public <T> Registry<T> makeRegistry(ResourceKey<Registry<T>> key) {
+    public <T> Registry<T> makeRegistry(ResourceKey<Registry<T>> key, boolean sync) {
         DeferredRegister<T> deferred = DeferredRegister.create(key, Quick.MID);
         ModBusDistributor.add(deferred::register);
-        return deferred.makeRegistry(_ -> {});
+        return deferred.makeRegistry(builder -> builder.sync(sync));
     }
 
     @Override

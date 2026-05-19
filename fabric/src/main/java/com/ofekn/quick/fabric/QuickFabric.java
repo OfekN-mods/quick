@@ -2,7 +2,7 @@ package com.ofekn.quick.fabric;
 
 import com.ofekn.quick.impl.common.Quick;
 import com.ofekn.quick.item.CoasItem;
-import com.ofekn.quick.impl.common.network.SBOpen;
+import com.ofekn.quick.impl.common.network.SBItemAction;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -53,7 +53,7 @@ public class QuickFabric implements ModInitializer {
     }
 
     private void registerPackets() {
-        PayloadTypeRegistry.serverboundPlay().register(SBOpen.TYPE, SBOpen.CODEC);
-        ServerPlayNetworking.registerGlobalReceiver(SBOpen.TYPE, (payload, context) -> payload.handle(context.player()));
+        PayloadTypeRegistry.serverboundPlay().register(SBItemAction.TYPE, SBItemAction.CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(SBItemAction.TYPE, (payload, context) -> payload.handle(context.player()));
     }
 }
