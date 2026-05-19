@@ -1,11 +1,11 @@
-package com.ofekn.quick;
+package com.ofekn.quick.impl.common;
 
 import com.ofekn.quick.api.QuickApi;
 import com.ofekn.quick.api.QuickRegistry;
-import com.ofekn.quick.impl.slot.ContainerSlotKey;
-import com.ofekn.quick.impl.slot.EmptySlotKey;
-import com.ofekn.quick.impl.slot.InventorySlotKey;
-import com.ofekn.quick.integration.CoasIntegrations;
+import com.ofekn.quick.impl.common.integration.QuickIntegrations;
+import com.ofekn.quick.impl.common.slot.ContainerSlotKey;
+import com.ofekn.quick.impl.common.slot.EmptySlotKey;
+import com.ofekn.quick.impl.common.slot.InventorySlotKey;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -28,7 +28,7 @@ public final class Quick {
             return IntStream.range(0, inventorySize).mapToObj(InventorySlotKey::new);
         });
 
-        var slotTypeRegistrar = CoasIntegrations.PLATFORM.createRegistrar(QuickRegistry.SLOT_TYPE);
+        var slotTypeRegistrar = QuickIntegrations.PLATFORM.createRegistrar(QuickRegistry.SLOT_TYPE);
         slotTypeRegistrar.register("empty", () -> EmptySlotKey.TYPE);
         slotTypeRegistrar.register("inventory", () -> InventorySlotKey.TYPE);
         slotTypeRegistrar.register("container", () -> ContainerSlotKey.TYPE);

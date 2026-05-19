@@ -1,4 +1,4 @@
-package com.ofekn.quick.client;
+package com.ofekn.quick.impl.client;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;

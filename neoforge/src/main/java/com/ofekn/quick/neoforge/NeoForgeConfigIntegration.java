@@ -1,6 +1,6 @@
 package com.ofekn.quick.neoforge;
 
-import com.ofekn.quick.integration.IConfigIntegration;
+import com.ofekn.quick.impl.common.integration.IConfigIntegration;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;

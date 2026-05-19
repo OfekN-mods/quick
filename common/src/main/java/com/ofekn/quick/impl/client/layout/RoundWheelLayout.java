@@ -1,5 +1,7 @@
-package com.ofekn.quick.client;
+package com.ofekn.quick.impl.client.layout;
 
+import com.ofekn.quick.api.WheelLayoutSupplier;
+import com.ofekn.quick.impl.client.WheelPolygon;
 import org.joml.Math;
 import org.joml.Vector2f;
 

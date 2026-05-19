@@ -1,8 +1,8 @@
 package com.ofekn.quick.fabric;
 
-import com.ofekn.quick.Quick;
+import com.ofekn.quick.impl.common.Quick;
 import com.ofekn.quick.item.CoasItem;
-import com.ofekn.quick.network.SBOpen;
+import com.ofekn.quick.impl.common.network.SBOpen;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;

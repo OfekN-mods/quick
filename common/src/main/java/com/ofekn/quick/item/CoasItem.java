@@ -1,9 +1,8 @@
 package com.ofekn.quick.item;
 
 import com.mojang.logging.LogUtils;
-import com.ofekn.quick.QuickUtils;
 import com.ofekn.quick.api.Ref;
-import com.ofekn.quick.integration.CoasIntegrations;
+import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -86,7 +85,7 @@ public final class CoasItem<I extends Item> implements Supplier<I> {
     }
 
     private static void onContainerClosed(Player player, Supplier<? extends Item> itemReg, AbstractContainerMenu menu, int offset, int slotCount) {
-        if (!CoasIntegrations.CONFIG.getStoreItems()) {
+        if (!QuickIntegrations.CONFIG.getStoreItems()) {
             return;
         }
 

@@ -1,9 +1,9 @@
 package com.ofekn.quick.fabric;
 
-import com.ofekn.quick.Quick;
-import com.ofekn.quick.integration.IConfigIntegration;
-import com.ofekn.quick.integration.IPlatformIntegration;
-import com.ofekn.quick.integration.Registrar;
+import com.ofekn.quick.impl.common.Quick;
+import com.ofekn.quick.impl.common.integration.IConfigIntegration;
+import com.ofekn.quick.impl.common.integration.IPlatformIntegration;
+import com.ofekn.quick.impl.common.integration.Registrar;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.loader.api.FabricLoader;

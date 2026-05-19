@@ -1,15 +1,15 @@
 package com.ofekn.quick.neoforge;
 
-import com.ofekn.quick.Quick;
-import com.ofekn.quick.network.SBOpen;
+import com.ofekn.quick.impl.common.Quick;
+import com.ofekn.quick.impl.common.network.SBOpen;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @EventBusSubscriber(modid = Quick.MID)
-final class CoasEvents {
-    private CoasEvents() {}
+final class QuickEvents {
+    private QuickEvents() {}
 
     @SubscribeEvent
     public static void register(RegisterPayloadHandlersEvent event) {

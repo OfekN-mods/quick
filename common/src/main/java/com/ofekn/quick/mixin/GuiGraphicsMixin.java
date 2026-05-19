@@ -1,8 +1,8 @@
 package com.ofekn.quick.mixin;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.ofekn.quick.client.ColoredPolygonRenderState;
-import com.ofekn.quick.client.IGuiGraphicsExtender;
+import com.ofekn.quick.impl.client.ColoredPolygonRenderState;
+import com.ofekn.quick.impl.client.IGuiGraphicsExtender;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
@@ -19,7 +19,7 @@ public class GuiGraphicsMixin implements IGuiGraphicsExtender {
     private GuiRenderState guiRenderState;
 
 	@Override
-	public void coas$renderColoredPolygon(RenderPipeline pipeline, Vector2f[] points, int color) {
+	public void quick$renderColoredPolygon(RenderPipeline pipeline, Vector2f[] points, int color) {
 		guiRenderState.addGuiElement(new ColoredPolygonRenderState(
 				pipeline,
 				TextureSetup.noTexture(),

@@ -1,4 +1,4 @@
-package com.ofekn.quick;
+package com.ofekn.quick.item;
 
 import com.ofekn.quick.api.ISlotKey;
 import com.ofekn.quick.api.QuickApi;
@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 // TODO delete
+@Deprecated
 public final class QuickUtils {
     private QuickUtils() {}
 

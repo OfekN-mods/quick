@@ -3,7 +3,7 @@ package com.ofekn.quick.fabric;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mojang.logging.LogUtils;
-import com.ofekn.quick.integration.IConfigIntegration;
+import com.ofekn.quick.impl.common.integration.IConfigIntegration;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;

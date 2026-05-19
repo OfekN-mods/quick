@@ -1,4 +1,4 @@
-package com.ofekn.quick.impl.slot;
+package com.ofekn.quick.impl.common.slot;
 
 import com.ofekn.quick.api.ISlotKey;
 import com.ofekn.quick.api.SlotType;
@@ -13,7 +13,7 @@ public record ContainerSlotKey(int index) implements ISlotKey {
             ByteBufCodecs.VAR_INT, ContainerSlotKey::index,
             ContainerSlotKey::new
     );
-    public static final SlotType<ContainerSlotKey> TYPE = new SlotType<>(STREAM_CODEC);
+    public static final SlotType<ContainerSlotKey> TYPE = new SlotType<>("container", STREAM_CODEC);
 
     public ContainerSlotKey {
         if (index < 0) {

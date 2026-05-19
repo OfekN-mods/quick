@@ -1,4 +1,4 @@
-package com.ofekn.quick.integration;
+package com.ofekn.quick.impl.common.integration;
 
 import net.minecraft.core.Registry;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;

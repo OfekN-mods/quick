@@ -1,10 +1,10 @@
 package com.ofekn.quick.neoforge;
 
 import com.mojang.logging.LogUtils;
-import com.ofekn.quick.Quick;
-import com.ofekn.quick.integration.IConfigIntegration;
-import com.ofekn.quick.integration.IPlatformIntegration;
-import com.ofekn.quick.integration.Registrar;
+import com.ofekn.quick.impl.common.Quick;
+import com.ofekn.quick.impl.common.integration.IConfigIntegration;
+import com.ofekn.quick.impl.common.integration.IPlatformIntegration;
+import com.ofekn.quick.impl.common.integration.Registrar;
 import net.minecraft.core.Registry;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;

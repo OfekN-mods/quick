@@ -1,8 +1,8 @@
 package com.ofekn.quick.neoforge.client;
 
-import com.ofekn.quick.Quick;
-import com.ofekn.quick.client.QuickClient;
-import com.ofekn.quick.client.QuickKeyMappings;
+import com.ofekn.quick.impl.common.Quick;
+import com.ofekn.quick.impl.client.QuickClient;
+import com.ofekn.quick.impl.client.QuickKeyMappings;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;

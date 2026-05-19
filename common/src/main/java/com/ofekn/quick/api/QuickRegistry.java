@@ -1,8 +1,8 @@
 package com.ofekn.quick.api;
 
-import com.ofekn.quick.integration.CoasIntegrations;
+import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import net.minecraft.core.Registry;
 
 public class QuickRegistry {
-    public static final Registry<SlotType<?>> SLOT_TYPE = CoasIntegrations.PLATFORM.makeRegistry(QuickRegistryKeys.SLOT_TYPE);
+    public static final Registry<SlotType<?>> SLOT_TYPE = QuickIntegrations.PLATFORM.makeRegistry(QuickRegistryKeys.SLOT_TYPE);
 }

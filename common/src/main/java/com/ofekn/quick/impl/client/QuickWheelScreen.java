@@ -2,11 +2,10 @@ package com.ofekn.quick.impl.client;
 
 import com.ofekn.quick.api.client.IWheelOption;
 import com.ofekn.quick.api.client.WheelData;
-import com.ofekn.quick.client.ListWheelLayout;
-import com.ofekn.quick.client.RoundWheelLayout;
-import com.ofekn.quick.client.WheelLayoutSupplier;
-import com.ofekn.quick.client.WheelPolygon;
-import com.ofekn.quick.integration.CoasIntegrations;
+import com.ofekn.quick.impl.client.layout.ListWheelLayout;
+import com.ofekn.quick.impl.client.layout.RoundWheelLayout;
+import com.ofekn.quick.api.WheelLayoutSupplier;
+import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -42,7 +41,7 @@ public class QuickWheelScreen extends Screen {
 		this.selectionIndex = 0;
 		this.openTick = 0;
 
-		String layoutName = CoasIntegrations.CONFIG.getWheelType();
+		String layoutName = QuickIntegrations.CONFIG.getWheelType();
 		for (WheelLayoutSupplier possibleLayout : POSSIBLE_LAYOUTS) {
 			if (possibleLayout.getSerializedName().equalsIgnoreCase(layoutName)) {
 				this.layoutSupplier = possibleLayout;
@@ -51,7 +50,7 @@ public class QuickWheelScreen extends Screen {
 		}
 		if (this.layoutSupplier == null) {
 			this.layoutSupplier = POSSIBLE_LAYOUTS.getFirst();
-			CoasIntegrations.CONFIG.setWheelType(this.layoutSupplier.getSerializedName());
+			QuickIntegrations.CONFIG.setWheelType(this.layoutSupplier.getSerializedName());
 		}
 	}
 
@@ -65,7 +64,7 @@ public class QuickWheelScreen extends Screen {
 			int index = POSSIBLE_LAYOUTS.indexOf(layoutSupplier);
 			int newIndex = (index + 1) % POSSIBLE_LAYOUTS.size();
 			this.layoutSupplier = POSSIBLE_LAYOUTS.get(newIndex);
-            CoasIntegrations.CONFIG.setWheelType(this.layoutSupplier.getSerializedName());
+            QuickIntegrations.CONFIG.setWheelType(this.layoutSupplier.getSerializedName());
 			return true;
 		}
 		return super.mouseReleased(event);

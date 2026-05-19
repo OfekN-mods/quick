@@ -1,7 +1,6 @@
 package com.ofekn.quick.api;
 
-import com.ofekn.quick.Quick;
-import com.ofekn.quick.integration.CoasIntegrations;
+import com.ofekn.quick.impl.common.Quick;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 

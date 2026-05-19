@@ -1,17 +1,13 @@
-package com.ofekn.quick.client;
+package com.ofekn.quick.impl.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.ofekn.quick.QuickUtils;
-import com.ofekn.quick.api.ISlotKey;
 import com.ofekn.quick.api.IWheelItem;
 import com.ofekn.quick.api.QuickApi;
-import com.ofekn.quick.api.Ref;
 import com.ofekn.quick.api.client.IWheelOption;
 import com.ofekn.quick.api.client.QuickClientApi;
 import com.ofekn.quick.api.client.WheelData;
-import com.ofekn.quick.impl.client.QuickWheelScreen;
-import com.ofekn.quick.integration.CoasIntegrations;
-import com.ofekn.quick.network.SBOpen;
+import com.ofekn.quick.impl.common.integration.QuickIntegrations;
+import com.ofekn.quick.impl.common.network.SBOpen;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -56,7 +52,7 @@ public final class QuickClient {
         }
         ItemStack firstOption = options.getFirst();
         if (options.size() == 1 || !QuickKeyMappings.get().wheel.isDown()) {
-            CoasIntegrations.PLATFORM.sendPacketToServer(new SBOpen(firstOption));
+            QuickIntegrations.PLATFORM.sendPacketToServer(new SBOpen(firstOption));
             return;
         }
         QuickClientApi.openWheel(new WheelData() {
@@ -66,7 +62,7 @@ public final class QuickClient {
                     @Override
                     public void onSelect() {
                         lastSelection = stack;
-                        CoasIntegrations.PLATFORM.sendPacketToServer(new SBOpen(stack));
+                        QuickIntegrations.PLATFORM.sendPacketToServer(new SBOpen(stack));
                     }
 
                     @Override

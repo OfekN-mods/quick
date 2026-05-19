@@ -1,17 +1,14 @@
-package com.ofekn.quick.client;
+package com.ofekn.quick.impl.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.ofekn.quick.Quick;
+import com.ofekn.quick.impl.common.Quick;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 public final class QuickKeyMappings {

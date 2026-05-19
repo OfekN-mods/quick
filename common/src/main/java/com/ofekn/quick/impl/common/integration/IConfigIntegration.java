@@ -1,4 +1,4 @@
-package com.ofekn.quick.integration;
+package com.ofekn.quick.impl.common.integration;
 
 public interface IConfigIntegration {
     String getWheelType();
