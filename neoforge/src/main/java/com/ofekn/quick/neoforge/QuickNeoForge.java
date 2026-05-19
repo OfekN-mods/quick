@@ -2,6 +2,7 @@ package com.ofekn.quick.neoforge;
 
 
 import com.ofekn.quick.Quick;
+import com.ofekn.quick.integration.CoasIntegrations;
 import com.ofekn.quick.item.CoasItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -36,6 +37,10 @@ public class QuickNeoForge {
                 }).build()
         );
         tabsReg.register(bus);
+
+        if (CoasIntegrations.PLATFORM.isModLoaded("curios")) {
+            CuriosIntegration.register();
+        }
 
         NeoForgeConfigIntegration.register(modContainer);
     }

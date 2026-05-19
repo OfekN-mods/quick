@@ -27,4 +27,9 @@ public record ContainerSlotKey(int index) implements ISlotKey {
         slot.set(stack);
         return slot.getItem() == stack; // check just in case
     }
+
+    @Override
+    public boolean isModifiable(Player player) {
+        return true;
+    }
 }

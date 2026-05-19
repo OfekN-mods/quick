@@ -26,4 +26,9 @@ public record InventorySlotKey(int index) implements ISlotKey {
         inventory.setItem(index, stack);
         return true;
     }
+
+    @Override
+    public boolean isModifiable(Player player) {
+        return true;
+    }
 }

@@ -11,7 +11,6 @@ public final class CoasIntegrations {
 
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final IPlatformIntegration PLATFORM = loadPlatform();
-    public static final List<IInventoryExtender> INVENTORY_EXTENDERS = getInventoryExtenders();
     public static final IConfigIntegration CONFIG = PLATFORM.getConfigIntegration();
 
     private static IPlatformIntegration loadPlatform() {
@@ -20,20 +19,5 @@ public final class CoasIntegrations {
                 .orElseThrow(() -> new NullPointerException("Failed to load platform integration"));
         LOGGER.info("Loaded platform integration for {}", loadedService.getPlatformName());
         return loadedService;
-    }
-
-    private static List<IInventoryExtender> getInventoryExtenders() {
-        List<Optional<IInventoryExtender>> result = new ArrayList<>();
-        PLATFORM.getInventoryExtenders((a, b) -> result.add(getIntegration(a, b)));
-        return result.stream().flatMap(Optional::stream).toList();
-    }
-
-    private static <T> Optional<T> getIntegration(String modid, Supplier<? extends T> integration) {
-        if (PLATFORM.isModLoaded(modid)) {
-            LOGGER.info("Using integration for {}", modid);
-            return Optional.of(integration.get());
-        }
-        LOGGER.info("Skipping integration for {} since it is not present.", modid);
-        return Optional.empty();
     }
 }

@@ -1,17 +1,17 @@
 package com.ofekn.quick;
 
+import com.ofekn.quick.api.ISlotKey;
+import com.ofekn.quick.api.QuickApi;
 import com.ofekn.quick.api.Ref;
-import com.ofekn.quick.integration.CoasIntegrations;
-import com.ofekn.quick.integration.IInventoryExtender;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+// TODO delete
 public final class QuickUtils {
     private QuickUtils() {}
 
@@ -31,17 +31,19 @@ public final class QuickUtils {
     }
 
     public static List<Ref<ItemStack>> getFullInventory(Player player) {
-        List<Ref<ItemStack>> result = new ArrayList<>();
-        var inventory = player.getInventory();
-        Ref.forEveryIndex(
-                inventory::getItem,
-                inventory::setItem,
-                inventory.getContainerSize(),
-                result
-        );
-        for (IInventoryExtender extender : CoasIntegrations.INVENTORY_EXTENDERS) {
-            extender.get(player, result);
+        return QuickApi.getSlots(player).stream().<Ref<ItemStack>>map(slot -> new MigrationAssignedSlot(player, slot)).toList();
+    }
+
+    private record MigrationAssignedSlot(Player player, ISlotKey key) implements Ref<ItemStack> {
+
+        @Override
+        public ItemStack get() {
+            return key.get(player);
         }
-        return result;
+
+        @Override
+        public void set(ItemStack value) {
+            key.set(player, value);
+        }
     }
 }

@@ -2,9 +2,6 @@ package com.ofekn.quick.integration;
 
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-
 public interface IPlatformIntegration {
 
     /**
@@ -39,8 +36,6 @@ public interface IPlatformIntegration {
     }
 
     void sendPacketToServer(CustomPacketPayload payload);
-
-    default void getInventoryExtenders(BiConsumer<String, Supplier<IInventoryExtender>> output) {}
 
     IConfigIntegration getConfigIntegration();
 }

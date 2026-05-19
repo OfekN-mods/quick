@@ -1,29 +1,27 @@
 package com.ofekn.quick.neoforge;
 
-import com.ofekn.quick.api.Ref;
-import com.ofekn.quick.integration.IInventoryExtender;
+import com.ofekn.quick.api.QuickApi;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-public enum CuriosIntegration implements IInventoryExtender {
-    INSTANCE;
+final class CuriosIntegration {
+    private CuriosIntegration() {}
 
-    @Override
-    public void get(Player player, List<Ref<ItemStack>> result) {
-        CuriosApi.getCuriosInventory(player).ifPresent(itemHandler -> {
-            for (ICurioStacksHandler stackHandler : itemHandler.getCurios().values()) {
-                var stacks = stackHandler.getStacks();
-                Ref.forEveryIndex(
-                        stacks::getStackInSlot,
-                        stacks::setStackInSlot,
-                        stacks.getSlots(),
-                        result
-                );
-            }
-        });
+    public static void register() {
+        QuickApi.registerSlotAccess(CuriosIntegration::provide);
+    }
+
+    private static Stream<CuriosSlotKey> provide(Player player) {
+        var inv = CuriosApi.getCuriosInventory(player);
+        return inv.stream().map(ICuriosItemHandler::getCurios)
+                .map(Map::entrySet)
+                .flatMap(Set::stream)
+                .flatMap(entry -> IntStream.range(0, entry.getValue().getSlots()).mapToObj(i -> new CuriosSlotKey(entry.getKey(), i)));
     }
 }

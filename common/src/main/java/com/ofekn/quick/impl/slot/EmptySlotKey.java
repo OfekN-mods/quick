@@ -16,4 +16,9 @@ public enum EmptySlotKey implements ISlotKey {
     public boolean set(Player player, ItemStack stack) {
         return false;
     }
+
+    @Override
+    public boolean isModifiable(Player player) {
+        return false;
+    }
 }

@@ -24,4 +24,11 @@ public interface ISlotKey {
      * @return true if the operation was successful
      */
     boolean set(Player player, ItemStack stack);
+
+    /**
+     * @param player the container
+     * @return true if the slot is modifiable, else false
+     * @apiNote if this method returns true it doesn't necessarily mean set will be successful
+     */
+    boolean isModifiable(Player player);
 }
