@@ -2,7 +2,9 @@ package com.ofekn.quick.network;
 
 import com.ofekn.quick.Quick;
 import com.ofekn.quick.QuickUtils;
+import com.ofekn.quick.api.ISlotKey;
 import com.ofekn.quick.api.IWheelItem;
+import com.ofekn.quick.api.QuickApi;
 import com.ofekn.quick.api.Ref;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -25,9 +27,9 @@ public record SBOpen(ItemStack selected) implements CustomPacketPayload {
     }
 
 	public void handle(Player player) {
-        List<Ref<ItemStack>> inventory = QuickUtils.getFullInventory(player);
-        for (Ref<ItemStack> ref : inventory) {
-            ItemStack inventoryStack = ref.get();
+        List<ISlotKey> inventory = QuickApi.getSlots(player);
+        for (ISlotKey key : inventory) {
+            ItemStack inventoryStack = key.get(player);
             if (inventoryStack.isEmpty()) {
                 continue;
             }
@@ -38,7 +40,7 @@ public record SBOpen(ItemStack selected) implements CustomPacketPayload {
             if (!ItemStack.isSameItemSameComponents(representative, selected)) {
                 continue;
             }
-            wheelItem.onWheelAction(player, ref);
+            wheelItem.onWheelAction(player, key);
             break;
         }
 	}

@@ -1,22 +1,20 @@
-package com.ofekn.quick.client;
+package com.ofekn.quick.impl.client;
 
-import com.ofekn.quick.QuickUtils;
-import com.ofekn.quick.api.IWheelItem;
-import com.ofekn.quick.api.Ref;
+import com.ofekn.quick.api.client.IWheelOption;
+import com.ofekn.quick.api.client.WheelData;
+import com.ofekn.quick.client.ListWheelLayout;
+import com.ofekn.quick.client.RoundWheelLayout;
+import com.ofekn.quick.client.WheelLayoutSupplier;
+import com.ofekn.quick.client.WheelPolygon;
 import com.ofekn.quick.integration.CoasIntegrations;
-import com.ofekn.quick.network.SBOpen;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix3x2fStack;
 import org.joml.Vector2f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,30 +25,20 @@ public class QuickWheelScreen extends Screen {
 		POSSIBLE_LAYOUTS.add(RoundWheelLayout.INSTANCE);
 		POSSIBLE_LAYOUTS.add(ListWheelLayout.INSTANCE);
 	}
-	private static ItemStack lastSelection = ItemStack.EMPTY;
-	private final Player player;
-	private ItemStack selectionItem;
+	private final WheelData data;
+	@Nullable
+	private IWheelOption selectionOption;
 	private int selectionIndex;
 	private WheelLayoutSupplier layoutSupplier = RoundWheelLayout.INSTANCE;
 	private int openTick;
 
-	public static void trigger(Minecraft minecraft, Player player) {
-		List<ItemStack> options = getOptions(player);
-		if (options.isEmpty()) {
-			return;
-		}
-		ItemStack firstOption = options.getFirst();
-		if (options.size() == 1 || !QuickKeyMappings.get().wheel.isDown()) {
-            CoasIntegrations.PLATFORM.sendPacketToServer(new SBOpen(firstOption));
-			return;
-		}
-		minecraft.setScreen(new QuickWheelScreen(Component.empty(), player, firstOption));
-	}
+	public QuickWheelScreen(WheelData data) {
+		super(Component.empty());
 
-	protected QuickWheelScreen(Component title, Player player, ItemStack firstOption) {
-		super(title);
-		this.player = player;
-		this.selectionItem = firstOption;
+		this.data = data;
+
+		var initialOptions = data.options();
+		this.selectionOption = initialOptions.isEmpty() ? null : initialOptions.getFirst();
 		this.selectionIndex = 0;
 		this.openTick = 0;
 
@@ -63,41 +51,8 @@ public class QuickWheelScreen extends Screen {
 		}
 		if (this.layoutSupplier == null) {
 			this.layoutSupplier = POSSIBLE_LAYOUTS.getFirst();
-            CoasIntegrations.CONFIG.setWheelType(this.layoutSupplier.getSerializedName());
+			CoasIntegrations.CONFIG.setWheelType(this.layoutSupplier.getSerializedName());
 		}
-	}
-
-	public static List<ItemStack> getOptions(Player player) {
-		List<ItemStack> allOptions = QuickUtils.getFullInventory(player)
-				.stream()
-				.map(Ref::get)
-				.map(stack -> stack.getItem() instanceof IWheelItem item ? item.getWheelRepresentative(player, stack) : ItemStack.EMPTY)
-				.filter(stack -> !stack.isEmpty())
-				.toList();
-		
-		// Deduplicate using ItemStack.isSameItemSameComponents
-		List<ItemStack> result = new ArrayList<>();
-		for (ItemStack stack : allOptions) {
-			boolean isDuplicate = false;
-			for (ItemStack existing : result) {
-				if (ItemStack.isSameItemSameComponents(stack, existing)) {
-					isDuplicate = true;
-					break;
-				}
-			}
-			if (!isDuplicate) {
-				result.add(stack);
-			}
-		}
-		
-		for (int i = 0; i < result.size(); i++) {
-			if (ItemStack.isSameItemSameComponents(result.get(i), lastSelection)) {
-				result.remove(i);
-				result.addFirst(lastSelection);
-				break;
-			}
-		}
-		return result;
 	}
 
 	@Override
@@ -125,22 +80,16 @@ public class QuickWheelScreen extends Screen {
 	public void tick() {
 		super.tick();
 		openTick++;
-	}
-
-	@Override
-	public boolean keyReleased(KeyEvent event) {
-		if (!QuickKeyMappings.get().wheel.isDown()) {
-			select();
-			return true;
+		switch (data.status()) {
+			case CANCEL -> onClose();
+			case FINISH_SELECT -> select();
 		}
-		return super.keyReleased(event);
 	}
 
 	private void select() {
 		this.onClose();
-		if (!selectionItem.isEmpty()) {
-			lastSelection = selectionItem;
-            CoasIntegrations.PLATFORM.sendPacketToServer(new SBOpen(selectionItem));
+		if (selectionOption != null) {
+			selectionOption.onSelect();
 		}
 	}
 
@@ -151,7 +100,7 @@ public class QuickWheelScreen extends Screen {
 		float dmx = (float) mouseX - (float) width / 2;
 		float dmy = (float) mouseY - (float) height / 2;
 
-		List<ItemStack> options = getOptions(player);
+		var options = data.options();
 		WheelPolygon[] layout = getLayout(options.size());
 		float smallestDistance = Float.POSITIVE_INFINITY;
 		int newSelection = 0;
@@ -165,7 +114,7 @@ public class QuickWheelScreen extends Screen {
 			}
 		}
 		selectionIndex = newSelection;
-		selectionItem = newSelection < options.size() ? options.get(newSelection) : ItemStack.EMPTY;
+		selectionOption = newSelection < options.size() ? options.get(newSelection) : null;
 	}
 
     @Override
@@ -175,7 +124,7 @@ public class QuickWheelScreen extends Screen {
 
 		float t = Math.min(1.0f, getAnimationT(partialTick));
 
-		List<ItemStack> options = getOptions(player);
+		var options = data.options();
 
 		int numOptions = options.size();
 		float centerX = width * 0.5f;
@@ -203,7 +152,7 @@ public class QuickWheelScreen extends Screen {
 			float y = polygon.center().y;
 			pos.pushMatrix();
 			pos.translate(x, y);
-            graphics.fakeItem(options.get(i), -8, -8);
+			options.get(i).extract(graphics);
 			pos.popMatrix();
 
 			if (selectionIndex == i) {
@@ -212,18 +161,9 @@ public class QuickWheelScreen extends Screen {
 			}
 		}
 		pos.popMatrix();
-		if (t > 0.99f) { // Only show tooltip when mostly faded in
-            graphics.setTooltipForNextFrame(
-					this.font,
-					getTooltipFromItem(minecraft, selectionItem),
-					selectionItem.getTooltipImage(),
-					mouseX,
-					mouseY,
-					selectionItem.get(DataComponents.TOOLTIP_STYLE)
-			);
+		if (t > 0.99f && selectionOption != null) { // Only show tooltip when mostly faded in
+			selectionOption.extractTooltip(graphics, mouseX, mouseY);
 		}
-		// this is cool looking, but can have issues if it's too wide compared to the window
-//		guiGraphics.renderTooltip(font, selection, (int)(centerX + radius + 8), (int)(centerY - radius));
 	}
 
     @Override

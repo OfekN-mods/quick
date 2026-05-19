@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+@Deprecated
 public final class CoasItem<I extends Item> implements Supplier<I> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private final String name;

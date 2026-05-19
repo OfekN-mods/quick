@@ -9,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+@Deprecated
 public class DummyContainerLevelAccess implements ContainerLevelAccess {
     private final Entity entity;
     @Nullable

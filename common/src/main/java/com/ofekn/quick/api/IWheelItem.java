@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
  *
  * @see Ref
  */
+@Deprecated
 public interface IWheelItem  {
     /**
      * Called when the player selects this item from the selection wheel.
@@ -26,7 +27,7 @@ public interface IWheelItem  {
      * @param player the player who selected the item
      * @param stackRef a reference to the ItemStack in the player's inventory that can be modified
      */
-    void onWheelAction(Player player, Ref<ItemStack> stackRef);
+    void onWheelAction(Player player, ISlotKey stackRef);
 
     /**
      * Returns a representative ItemStack for display and comparison in the selection wheel.

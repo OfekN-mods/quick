@@ -15,6 +15,7 @@ import java.util.function.*;
  *
  * @param <V> the type of value being referenced
  */
+@Deprecated
 public interface Ref<V> {
     /**
      * Gets the current value.

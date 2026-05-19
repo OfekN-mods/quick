@@ -1,5 +1,6 @@
 package com.ofekn.quick.item;
 
+import com.ofekn.quick.api.ISlotKey;
 import com.ofekn.quick.api.IWheelItem;
 import com.ofekn.quick.api.Ref;
 import net.minecraft.core.component.DataComponents;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.Nullable;
 
+@Deprecated
 public class ItemOnAStick extends Item implements IWheelItem {
     private final MenuProvider menuProvider;
     private final Component itemName;
@@ -85,7 +87,7 @@ public class ItemOnAStick extends Item implements IWheelItem {
     }
 
     @Override
-    public void onWheelAction(Player player, Ref<ItemStack> stackRef) {
-        stackRef.set(openContainer(player, stackRef.get()));
+    public void onWheelAction(Player player, ISlotKey key) {
+        key.set(player, openContainer(player, key.get(player)));
     }
 }
