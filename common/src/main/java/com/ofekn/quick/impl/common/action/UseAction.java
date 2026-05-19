@@ -1,9 +1,12 @@
 package com.ofekn.quick.impl.common.action;
 
 import com.mojang.serialization.MapCodec;
+import com.ofekn.quick.api.common.ActionType;
 import com.ofekn.quick.api.common.ISlotKey;
 import com.ofekn.quick.api.common.IItemAction;
 import com.ofekn.quick.impl.common.slot.InventorySlotKey;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -14,10 +17,12 @@ public enum UseAction implements IItemAction {
     INSTANCE;
 
     public static final MapCodec<UseAction> CODEC = MapCodec.unit(INSTANCE);
+    public static final StreamCodec<ByteBuf, UseAction> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final ActionType<UseAction> TYPE = new ActionType<>(CODEC, STREAM_CODEC);
 
     @Override
-    public MapCodec<? extends IItemAction> codec() {
-        return CODEC;
+    public ActionType<?> type() {
+        return TYPE;
     }
 
     @Override

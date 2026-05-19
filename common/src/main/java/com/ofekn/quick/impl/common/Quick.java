@@ -36,8 +36,8 @@ public final class Quick {
         slotTypeRegistrar.register("inventory", () -> InventorySlotKey.TYPE);
         slotTypeRegistrar.register("container", () -> ContainerSlotKey.TYPE);
 
-        var actionRegistrar = QuickIntegrations.PLATFORM.createRegistrar(QuickRegistry.ITEM_ACTION);
-        actionRegistrar.register("use", () -> UseAction.CODEC);
+        var actionRegistrar = QuickIntegrations.PLATFORM.createRegistrar(QuickRegistry.ACTION_TYPE);
+        actionRegistrar.register("use", () -> UseAction.TYPE);
 
         var dcRegistrar = QuickIntegrations.PLATFORM.createRegistrar(BuiltInRegistries.DATA_COMPONENT_TYPE);
         dcRegistrar.register("item_action", () -> QuickDataComponents.ITEM_ACTION);

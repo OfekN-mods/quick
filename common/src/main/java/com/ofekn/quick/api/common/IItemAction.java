@@ -1,17 +1,20 @@
 package com.ofekn.quick.api.common;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.function.Function;
-
 public interface IItemAction {
-    Codec<IItemAction> CODEC = QuickRegistry.ITEM_ACTION.byNameCodec().dispatch(
-            IItemAction::codec,
-            Function.identity()
+    Codec<IItemAction> CODEC = ActionType.CODEC.dispatch(
+            IItemAction::type,
+            ActionType::codec
+    );
+    StreamCodec<RegistryFriendlyByteBuf, IItemAction> STREAM_CODEC = ActionType.STREAM_CODEC.dispatch(
+            IItemAction::type,
+            ActionType::streamCodec
     );
 
-    MapCodec<? extends IItemAction> codec();
+    ActionType<?> type();
     void onItemAction(Player player, ISlotKey slot);
 }
