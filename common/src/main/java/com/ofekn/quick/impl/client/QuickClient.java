@@ -3,7 +3,7 @@ package com.ofekn.quick.impl.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.ofekn.quick.api.client.QuickClientRegistry;
 import com.ofekn.quick.api.common.ISlotKey;
-import com.ofekn.quick.api.common.IWheelItem;
+import com.ofekn.quick.item.IWheelItem;
 import com.ofekn.quick.api.common.QuickApi;
 import com.ofekn.quick.api.client.IWheelOption;
 import com.ofekn.quick.api.client.QuickClientApi;

@@ -1,4 +1,4 @@
-package com.ofekn.quick.api.common;
+package com.ofekn.quick.item;
 
 import java.util.List;
 import java.util.function.*;

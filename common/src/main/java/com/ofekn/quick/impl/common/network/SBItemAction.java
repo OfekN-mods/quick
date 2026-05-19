@@ -2,7 +2,7 @@ package com.ofekn.quick.impl.common.network;
 
 import com.ofekn.quick.api.common.IItemAction;
 import com.ofekn.quick.api.common.ISlotKey;
-import com.ofekn.quick.api.common.IWheelItem;
+import com.ofekn.quick.item.IWheelItem;
 import com.ofekn.quick.api.common.QuickDataComponents;
 import com.ofekn.quick.api.common.QuickRegistryKeys;
 import com.ofekn.quick.impl.common.Quick;

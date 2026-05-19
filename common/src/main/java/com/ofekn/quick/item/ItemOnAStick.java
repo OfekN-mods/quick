@@ -1,7 +1,6 @@
 package com.ofekn.quick.item;
 
 import com.ofekn.quick.api.common.ISlotKey;
-import com.ofekn.quick.api.common.IWheelItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;

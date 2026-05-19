@@ -2,7 +2,6 @@ package com.ofekn.quick.item;
 
 import com.ofekn.quick.api.common.ISlotKey;
 import com.ofekn.quick.api.common.QuickApi;
-import com.ofekn.quick.api.common.Ref;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
