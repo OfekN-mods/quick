@@ -21,7 +21,7 @@ import org.joml.Vector2f;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CoasWheelScreen extends Screen {
+public class QuickWheelScreen extends Screen {
 	public static final List<WheelLayoutSupplier> POSSIBLE_LAYOUTS = new ArrayList<>();
 	static {
 		POSSIBLE_LAYOUTS.add(RoundWheelLayout.INSTANCE);
@@ -40,14 +40,14 @@ public class CoasWheelScreen extends Screen {
 			return;
 		}
 		ItemStack firstOption = options.getFirst();
-		if (options.size() == 1 || !CoasKeyMappings.OPEN_CURIOS_KEY.isDown()) {
+		if (options.size() == 1 || !QuickKeyMappings.get().wheel.isDown()) {
             CoasIntegrations.PLATFORM.sendPacketToServer(new SBOpen(firstOption));
 			return;
 		}
-		minecraft.setScreen(new CoasWheelScreen(Component.empty(), player, firstOption));
+		minecraft.setScreen(new QuickWheelScreen(Component.empty(), player, firstOption));
 	}
 
-	protected CoasWheelScreen(Component title, Player player, ItemStack firstOption) {
+	protected QuickWheelScreen(Component title, Player player, ItemStack firstOption) {
 		super(title);
 		this.player = player;
 		this.selectionItem = firstOption;
@@ -129,7 +129,7 @@ public class CoasWheelScreen extends Screen {
 
 	@Override
 	public boolean keyReleased(KeyEvent event) {
-		if (!CoasKeyMappings.OPEN_CURIOS_KEY.isDown()) {
+		if (!QuickKeyMappings.get().wheel.isDown()) {
 			select();
 			return true;
 		}

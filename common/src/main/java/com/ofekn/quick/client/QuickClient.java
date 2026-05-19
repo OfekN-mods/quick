@@ -13,7 +13,7 @@ public final class QuickClient {
     }
 
     private static void openWheelIfClicked(Minecraft minecraft) {
-        if (!CoasKeyMappings.OPEN_CURIOS_KEY.consumeClick()) {
+        if (!QuickKeyMappings.get().wheel.consumeClick()) {
             return;
         }
         if (minecraft.screen != null) {
@@ -23,6 +23,6 @@ public final class QuickClient {
         if (player == null) {
             return;
         }
-        CoasWheelScreen.trigger(minecraft, player);
+        QuickWheelScreen.trigger(minecraft, player);
     }
 }

@@ -2,7 +2,8 @@ package com.ofekn.quick.neoforge.client;
 
 import com.ofekn.quick.Quick;
 import com.ofekn.quick.client.QuickClient;
-import com.ofekn.quick.client.CoasKeyMappings;
+import com.ofekn.quick.client.QuickKeyMappings;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -12,8 +13,8 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
 
 @EventBusSubscriber(modid = Quick.MID, value = Dist.CLIENT)
-final class CoasClientEvents {
-    private CoasClientEvents() {}
+final class QuickClientEvents {
+    private QuickClientEvents() {}
 
     @SubscribeEvent
     public static void event(RegisterClientPayloadHandlersEvent event) {
@@ -21,7 +22,11 @@ final class CoasClientEvents {
 
     @SubscribeEvent
     public static void event(RegisterKeyMappingsEvent event) {
-        CoasKeyMappings.LIST.forEach(event::register);
+        QuickKeyMappings.init(id -> {
+            KeyMapping.Category category = new KeyMapping.Category(id);
+            event.registerCategory(category);
+            return category;
+        }, event::register);
     }
 
     @SubscribeEvent
