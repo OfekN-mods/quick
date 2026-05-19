@@ -10,6 +10,7 @@ import net.minecraft.client.KeyMapping;
 public class QuickFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        QuickClient.init();
         QuickKeyMappings.init(KeyMapping.Category::register, KeyMappingHelper::registerKeyMapping);
         ClientTickEvents.START_CLIENT_TICK.register(QuickClient::tick);
     }

@@ -1,4 +1,4 @@
-package com.ofekn.quick.api;
+package com.ofekn.quick.api.common;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

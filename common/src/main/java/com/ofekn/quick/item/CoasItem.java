@@ -1,7 +1,7 @@
 package com.ofekn.quick.item;
 
 import com.mojang.logging.LogUtils;
-import com.ofekn.quick.api.Ref;
+import com.ofekn.quick.api.common.Ref;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;

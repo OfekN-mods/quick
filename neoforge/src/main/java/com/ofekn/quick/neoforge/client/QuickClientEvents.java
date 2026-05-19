@@ -10,11 +10,18 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.lifecycle.ClientLifecycleEvent;
+import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent;
 import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
 
 @EventBusSubscriber(modid = Quick.MID, value = Dist.CLIENT)
 final class QuickClientEvents {
     private QuickClientEvents() {}
+
+    @SubscribeEvent
+    public static void event(ClientStartedEvent event) {
+
+    }
 
     @SubscribeEvent
     public static void event(RegisterClientPayloadHandlersEvent event) {

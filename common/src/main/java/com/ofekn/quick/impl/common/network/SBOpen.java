@@ -1,9 +1,9 @@
 package com.ofekn.quick.impl.common.network;
 
 import com.ofekn.quick.impl.common.Quick;
-import com.ofekn.quick.api.ISlotKey;
-import com.ofekn.quick.api.IWheelItem;
-import com.ofekn.quick.api.QuickApi;
+import com.ofekn.quick.api.common.ISlotKey;
+import com.ofekn.quick.api.common.IWheelItem;
+import com.ofekn.quick.api.common.QuickApi;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;

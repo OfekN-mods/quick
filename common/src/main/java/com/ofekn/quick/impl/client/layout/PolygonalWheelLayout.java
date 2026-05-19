@@ -1,15 +1,15 @@
 package com.ofekn.quick.impl.client.layout;
 
-import com.ofekn.quick.api.WheelLayoutSupplier;
-import com.ofekn.quick.impl.client.WheelPolygon;
+import com.ofekn.quick.api.client.WheelLayout;
+import com.ofekn.quick.api.client.WheelPolygon;
 import org.joml.Math;
 import org.joml.Vector2f;
 
-public enum PolygonalWheelLayout implements WheelLayoutSupplier {
+public enum PolygonalWheelLayout implements WheelLayout {
 	INSTANCE;
 
 	@Override
-	public WheelPolygon[] apply(int numOptions) {
+	public WheelPolygon[] polygons(int numOptions) {
 		if (numOptions == 0) {
 			return new WheelPolygon[0];
 		}
@@ -54,10 +54,5 @@ public enum PolygonalWheelLayout implements WheelLayoutSupplier {
 		}
 
 		return result;
-	}
-
-	@Override
-	public String getSerializedName() {
-		return "polygonal";
 	}
 }

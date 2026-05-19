@@ -1,7 +1,7 @@
 package com.ofekn.quick.impl.common;
 
-import com.ofekn.quick.api.QuickApi;
-import com.ofekn.quick.api.QuickRegistry;
+import com.ofekn.quick.api.common.QuickApi;
+import com.ofekn.quick.api.common.QuickRegistry;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import com.ofekn.quick.impl.common.slot.ContainerSlotKey;
 import com.ofekn.quick.impl.common.slot.EmptySlotKey;

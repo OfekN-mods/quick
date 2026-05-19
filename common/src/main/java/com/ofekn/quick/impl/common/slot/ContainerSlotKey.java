@@ -1,7 +1,7 @@
 package com.ofekn.quick.impl.common.slot;
 
-import com.ofekn.quick.api.ISlotKey;
-import com.ofekn.quick.api.SlotType;
+import com.ofekn.quick.api.common.ISlotKey;
+import com.ofekn.quick.api.common.SlotType;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

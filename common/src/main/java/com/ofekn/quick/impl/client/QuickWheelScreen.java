@@ -1,34 +1,28 @@
 package com.ofekn.quick.impl.client;
 
-import com.ofekn.quick.api.client.IWheelOption;
-import com.ofekn.quick.api.client.WheelData;
-import com.ofekn.quick.impl.client.layout.ListWheelLayout;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.ofekn.quick.api.client.*;
 import com.ofekn.quick.impl.client.layout.RoundWheelLayout;
-import com.ofekn.quick.api.WheelLayoutSupplier;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.joml.Matrix3x2fStack;
 import org.joml.Vector2f;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 public class QuickWheelScreen extends Screen {
-	public static final List<WheelLayoutSupplier> POSSIBLE_LAYOUTS = new ArrayList<>();
-	static {
-		POSSIBLE_LAYOUTS.add(RoundWheelLayout.INSTANCE);
-		POSSIBLE_LAYOUTS.add(ListWheelLayout.INSTANCE);
-	}
+	private static final WheelLayout FALLBACK_LAYOUT = RoundWheelLayout.INSTANCE;
 	private final WheelData data;
 	@Nullable
 	private IWheelOption selectionOption;
 	private int selectionIndex;
-	private WheelLayoutSupplier layoutSupplier = RoundWheelLayout.INSTANCE;
+	private WheelLayout layout;
 	private int openTick;
 
 	public QuickWheelScreen(WheelData data) {
@@ -41,18 +35,22 @@ public class QuickWheelScreen extends Screen {
 		this.selectionIndex = 0;
 		this.openTick = 0;
 
-		String layoutName = QuickIntegrations.CONFIG.getWheelType();
-		for (WheelLayoutSupplier possibleLayout : POSSIBLE_LAYOUTS) {
-			if (possibleLayout.getSerializedName().equalsIgnoreCase(layoutName)) {
-				this.layoutSupplier = possibleLayout;
-				break;
-			}
-		}
-		if (this.layoutSupplier == null) {
-			this.layoutSupplier = POSSIBLE_LAYOUTS.getFirst();
-			QuickIntegrations.CONFIG.setWheelType(this.layoutSupplier.getSerializedName());
+		String layoutStr = QuickIntegrations.CONFIG.getWheelType();
+		Identifier layoutId = Identifier.tryParse(layoutStr);
+		WheelLayout layout = layoutId == null ? null : QuickClientRegistry.WHEEL_LAYOUT.getValue(layoutId);
+		if (layout == null) {
+			this.layout = FALLBACK_LAYOUT;
+			updateConfig();
+		} else {
+			this.layout = layout;
 		}
 	}
+
+    private void updateConfig() {
+		Identifier id = QuickClientRegistry.WHEEL_LAYOUT.getKey(this.layout);
+		Objects.requireNonNull(id);
+		QuickIntegrations.CONFIG.setWheelType(id.toString());
+    }
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
@@ -61,10 +59,13 @@ public class QuickWheelScreen extends Screen {
 			return true;
 		}
 		if (event.button() == 1) {
-			int index = POSSIBLE_LAYOUTS.indexOf(layoutSupplier);
-			int newIndex = (index + 1) % POSSIBLE_LAYOUTS.size();
-			this.layoutSupplier = POSSIBLE_LAYOUTS.get(newIndex);
-            QuickIntegrations.CONFIG.setWheelType(this.layoutSupplier.getSerializedName());
+			int index = QuickClientRegistry.WHEEL_LAYOUT.getId(layout);
+			int newIndex = (index + 1) % QuickClientRegistry.WHEEL_LAYOUT.size();
+			var opt = QuickClientRegistry.WHEEL_LAYOUT.get(newIndex);
+			if (opt.isPresent() && opt.get().isBound()) {
+				this.layout = opt.get().value();
+				updateConfig();
+			}
 			return true;
 		}
 		return super.mouseReleased(event);
@@ -145,7 +146,7 @@ public class QuickWheelScreen extends Screen {
 		for (int i = 0; i < numOptions; i++) {
 			WheelPolygon polygon = layout[i];
 			int baseColor = selectionIndex == i ? 0xFFFFFFFF : 0x80FFFFFF;
-			polygon.fill(graphics, RenderPipelines.GUI, 0, applyAlpha(baseColor, t));
+			fill(polygon, graphics, RenderPipelines.GUI, 0, applyAlpha(baseColor, t));
 
 			float x = polygon.center().x;
 			float y = polygon.center().y;
@@ -156,7 +157,7 @@ public class QuickWheelScreen extends Screen {
 
 			if (selectionIndex == i) {
 				int overlayColor = applyAlpha(0x7FFFFFFF, t);
-				polygon.fill(graphics, RenderPipelines.GUI, 10, overlayColor);
+				fill(polygon, graphics, RenderPipelines.GUI, 10, overlayColor);
 			}
 		}
 		pos.popMatrix();
@@ -194,6 +195,11 @@ public class QuickWheelScreen extends Screen {
 	}
 
 	private WheelPolygon[] getLayout(int numOptions) {
-		return layoutSupplier.apply(numOptions);
+		return layout.polygons(numOptions);
+	}
+
+	private static void fill(WheelPolygon polygon, GuiGraphicsExtractor guiGraphics, RenderPipeline pipeline, float z, int color) {
+		// TODO support z
+		((IGuiGraphicsExtender)guiGraphics).quick$renderColoredPolygon(pipeline, polygon.points(), color);
 	}
 }

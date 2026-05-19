@@ -1,4 +1,4 @@
 @NullMarked
-package com.ofekn.quick.api;
+package com.ofekn.quick.api.common;
 
 import org.jspecify.annotations.NullMarked;

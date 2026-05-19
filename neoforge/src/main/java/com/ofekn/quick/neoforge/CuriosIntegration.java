@@ -1,8 +1,7 @@
 package com.ofekn.quick.neoforge;
 
-import com.ofekn.quick.api.QuickApi;
-import com.ofekn.quick.api.QuickRegistry;
-import com.ofekn.quick.impl.common.slot.EmptySlotKey;
+import com.ofekn.quick.api.common.QuickApi;
+import com.ofekn.quick.api.common.QuickRegistry;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import net.minecraft.world.entity.player.Player;
 import top.theillusivec4.curios.api.CuriosApi;

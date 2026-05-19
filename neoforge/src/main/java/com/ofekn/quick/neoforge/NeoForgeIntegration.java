@@ -24,8 +24,6 @@ import java.util.function.Supplier;
 
 public class NeoForgeIntegration implements IPlatformIntegration {
     private static final Logger LOG = LogUtils.getLogger();
-    @Nullable
-    private static List<Consumer<IEventBus>> modBusInit = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public String getPlatformName() {
@@ -45,14 +43,14 @@ public class NeoForgeIntegration implements IPlatformIntegration {
     @Override
     public <T> Registry<T> makeRegistry(ResourceKey<Registry<T>> key) {
         DeferredRegister<T> deferred = DeferredRegister.create(key, Quick.MID);
-        addModBusInit(deferred::register);
+        ModBusDistributor.add(deferred::register);
         return deferred.makeRegistry(_ -> {});
     }
 
     @Override
     public <T> Registrar<T> createRegistrar(Registry<T> registry) {
         DeferredRegister<T> deferred = DeferredRegister.create(registry, Quick.MID);
-        addModBusInit(deferred::register);
+        ModBusDistributor.add(deferred::register);
         // ide shows error for {@code deferred::register}, even though the compiler works
         return new Registrar<>() {
             @Override
@@ -62,15 +60,6 @@ public class NeoForgeIntegration implements IPlatformIntegration {
         };
     }
 
-    private void addModBusInit(Consumer<IEventBus> task) {
-        if (modBusInit == null) {
-            LOG.error("Registration after mod bus initialized");
-            return;
-        }
-        modBusInit.add(task);
-    }
-
-
     @Override
     public void sendPacketToServer(CustomPacketPayload payload) {
         ClientPacketDistributor.sendToServer(payload);
@@ -79,14 +68,5 @@ public class NeoForgeIntegration implements IPlatformIntegration {
     @Override
     public IConfigIntegration getConfigIntegration() {
         return NeoForgeConfigIntegration.INSTANCE;
-    }
-
-    public static void supplyModBus(IEventBus modBus) {
-        if (modBusInit == null) {
-            LOG.warn("Called SupplyModBus twice");
-            return;
-        }
-        modBusInit.forEach(task -> task.accept(modBus));
-        modBusInit = null;
     }
 }

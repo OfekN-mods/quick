@@ -1,13 +1,20 @@
 package com.ofekn.quick.impl.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.ofekn.quick.api.IWheelItem;
-import com.ofekn.quick.api.QuickApi;
+import com.ofekn.quick.api.client.QuickClientRegistry;
+import com.ofekn.quick.api.common.IWheelItem;
+import com.ofekn.quick.api.common.QuickApi;
 import com.ofekn.quick.api.client.IWheelOption;
 import com.ofekn.quick.api.client.QuickClientApi;
 import com.ofekn.quick.api.client.WheelData;
+import com.ofekn.quick.api.common.QuickRegistry;
+import com.ofekn.quick.impl.client.layout.ListWheelLayout;
+import com.ofekn.quick.impl.client.layout.RoundWheelLayout;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import com.ofekn.quick.impl.common.network.SBOpen;
+import com.ofekn.quick.impl.common.slot.ContainerSlotKey;
+import com.ofekn.quick.impl.common.slot.EmptySlotKey;
+import com.ofekn.quick.impl.common.slot.InventorySlotKey;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,6 +29,14 @@ import java.util.List;
 
 public final class QuickClient {
     private QuickClient() {}
+
+    public static void init() {
+        var layoutRegistrar = QuickIntegrations.PLATFORM.createRegistrar(QuickClientRegistry.WHEEL_LAYOUT);
+        layoutRegistrar.register("round", () -> ListWheelLayout.INSTANCE);
+//        layoutRegistrar.register("polygonal", () -> PolygonalWheelLayout.INSTANCE);
+        layoutRegistrar.register("list", () -> RoundWheelLayout.INSTANCE);
+
+    }
 
     @ApiStatus.Internal
     public static void tick(Minecraft minecraft) {
