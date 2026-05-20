@@ -32,7 +32,8 @@ export default defineConfig({
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/OfekN-mods/quick' },
-      { icon: 'discord', link: 'https://discord.gg/TXmFRWcpQ2' }
+      { icon: 'discord', link: 'https://discord.gg/TXmFRWcpQ2' },
+      { icon: 'curseforge', link: 'https://www.curseforge.com/minecraft/mc-mods/quick' },
     ]
   }
 })
