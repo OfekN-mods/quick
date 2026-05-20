@@ -8,5 +8,11 @@
   },
   "devDependencies": {
     "vitepress": "^1.6.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "postcss": "8.5.3",
+      "@iconify-json/simple-icons": "1.2.28"
+    }
   }
 }
