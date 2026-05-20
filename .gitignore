@@ -23,3 +23,8 @@ eclipse
 run
 runs
 .vscode
+
+# docs
+docs/node_modules
+docs/.vitepress/dist
+docs/.vitepress/cache

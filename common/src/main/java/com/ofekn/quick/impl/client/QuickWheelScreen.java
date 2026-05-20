@@ -2,6 +2,7 @@ package com.ofekn.quick.impl.client;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.ofekn.quick.api.client.*;
+import com.ofekn.quick.api.common.QuickDataComponents;
 import com.ofekn.quick.impl.client.layout.RoundWheelLayout;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -10,6 +11,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import org.joml.Matrix3x2fStack;
 import org.joml.Vector2f;
 import org.jspecify.annotations.Nullable;
