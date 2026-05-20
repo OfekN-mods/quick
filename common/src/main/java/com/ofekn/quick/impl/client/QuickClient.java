@@ -3,7 +3,6 @@ package com.ofekn.quick.impl.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.ofekn.quick.api.client.QuickClientRegistry;
 import com.ofekn.quick.api.common.ISlotKey;
-import com.ofekn.quick.item.IWheelItem;
 import com.ofekn.quick.api.common.QuickApi;
 import com.ofekn.quick.api.client.IWheelOption;
 import com.ofekn.quick.api.client.QuickClientApi;
@@ -125,7 +124,6 @@ public final class QuickClient {
                 .stream()
                 .filter(key -> {
                     ItemStack stack = key.get(player);
-                    if (stack.getItem() instanceof IWheelItem) return true;
                     if (stack.has(QuickDataComponents.ITEM_ACTION)) return true;
                     return actionRegistry.stream().anyMatch(qa -> qa.item().test(stack));
                 })

@@ -2,7 +2,6 @@ package com.ofekn.quick.impl.common.network;
 
 import com.ofekn.quick.api.common.IItemAction;
 import com.ofekn.quick.api.common.ISlotKey;
-import com.ofekn.quick.item.IWheelItem;
 import com.ofekn.quick.api.common.QuickDataComponents;
 import com.ofekn.quick.api.common.QuickRegistryKeys;
 import com.ofekn.quick.impl.common.Quick;
@@ -26,10 +25,6 @@ public record SBItemAction(ISlotKey key) implements CustomPacketPayload {
 
     public void handle(Player player) {
         ItemStack stack = key.get(player);
-        if (stack.getItem() instanceof IWheelItem wheelItem) {
-            wheelItem.onWheelAction(player, key);
-            return;
-        }
         IItemAction action = stack.get(QuickDataComponents.ITEM_ACTION);
         if (action != null) {
             action.onItemAction(player, key);
