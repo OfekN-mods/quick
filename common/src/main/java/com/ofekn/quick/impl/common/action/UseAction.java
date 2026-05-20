@@ -54,8 +54,13 @@ public enum UseAction implements IItemAction {
         if (transform == null) {
             transform = player.getItemInHand(InteractionHand.MAIN_HAND);
         }
+        // recover old item
         player.setItemInHand(InteractionHand.MAIN_HAND, temp);
-        if (slot.set(player, transform)) {
+        // give the player the interaction result
+        if (transform.isEmpty()) {
+            return;
+        }
+        if (slot.get(player).isEmpty() && slot.set(player, transform)) {
             return;
         }
         // copied logic from the give command
