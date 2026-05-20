@@ -29,18 +29,13 @@ jobs:
         with:
           node-version: 22
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: latest
-          package_json_file: docs/package.json
-
       - name: Install dependencies
         working-directory: docs
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Build
         working-directory: docs
-        run: pnpm run build
+        run: npm run build
 
       - uses: actions/configure-pages@v4
 
