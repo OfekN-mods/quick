@@ -36,6 +36,22 @@ artifacts {
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
 }
 
+tasks.register('apiJar', Jar) {
+    archiveClassifier = 'api'
+    from(sourceSets.main.output) {
+        include 'com/ofekn/quick/api/**'
+    }
+}
+
+tasks.register('apiSourcesJar', Jar) {
+    archiveClassifier = 'api-sources'
+    from(sourceSets.main.allJava) {
+        include 'com/ofekn/quick/api/**'
+    }
+}
+
+jar.dependsOn(apiJar, apiSourcesJar)
+
 // Implement mcgradleconventions loader attribute
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
 ['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
