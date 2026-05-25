@@ -6,6 +6,16 @@ dependencies {
     minecraft "com.mojang:minecraft:${run_minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+
+    if (refined_storage_fabric_version && run_with_refined_storage.toBoolean()) {
+        implementation "maven.modrinth:refined-storage:${refined_storage_fabric_version}"
+    }
+    if (ae2_fabric_version && run_with_ae2.toBoolean()) {
+        implementation "maven.modrinth:refined-storage:${refined_storage_fabric_version}"
+    }
+    if (simple_magnets_fabric_version && run_with_simple_magnets.toBoolean()) {
+        implementation "maven.modrinth:simple-magnets:${simple_magnets_fabric_version}"
+    }
 }
 
 loom {

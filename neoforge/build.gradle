@@ -47,6 +47,16 @@ dependencies {
     if (run_with_curios.toBoolean()) {
         runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
     }
+    if (refined_storage_neoforge_version && run_with_refined_storage.toBoolean()) {
+        implementation "maven.modrinth:refined-storage:${refined_storage_neoforge_version}"
+    }
+    if (ae2_neoforge_version && run_with_ae2.toBoolean()) {
+        runtimeOnly "maven.modrinth:guideme:${guideme_neoforge_version}"
+        implementation "maven.modrinth:ae2:${ae2_neoforge_version}"
+    }
+    if (simple_magnets_neoforge_version && run_with_simple_magnets.toBoolean()) {
+        implementation "maven.modrinth:simple-magnets:${simple_magnets_neoforge_version}"
+    }
 }
 
 // Implement mcgradleconventions loader attribute

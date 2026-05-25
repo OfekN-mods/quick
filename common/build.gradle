@@ -18,6 +18,16 @@ dependencies {
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.3'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.3'
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
+
+    if (refined_storage_fabric_version) {
+        compileOnly "maven.modrinth:refined-storage:${refined_storage_fabric_version}"
+    }
+    if (ae2_neoforge_version) {
+        compileOnly "maven.modrinth:ae2:${ae2_neoforge_version}"
+    }
+    if (simple_magnets_fabric_version) {
+        compileOnly "maven.modrinth:simple-magnets:${simple_magnets_fabric_version}"
+    }
 }
 
 configurations {
