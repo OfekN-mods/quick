@@ -18,8 +18,10 @@ public class QuickFabricClient implements ClientModInitializer {
         ClientTickEvents.START_CLIENT_TICK.register(QuickClient::tick);
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             if (!(screen instanceof AbstractContainerScreen<?> containerScreen)) return;
-            ScreenKeyboardEvents.allowKeyPress(screen).register((s, keyEvent) ->
-                    !QuickClient.onContainerScreenKeyPress(containerScreen, keyEvent));
+            ScreenKeyboardEvents.allowKeyPress(screen).register((s, keyEvent) -> {
+                if (!QuickKeyMappings.get().containerInteract.matches(keyEvent)) return true;
+                return !QuickClient.interactHoveredSlot(containerScreen);
+            });
         });
     }
 }
