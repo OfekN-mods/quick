@@ -25,6 +25,9 @@ public record SBItemAction(ISlotKey key) implements CustomPacketPayload {
 
     public void handle(Player player) {
         ItemStack stack = key.get(player);
+        if (player.getCooldowns().isOnCooldown(stack)) {
+            return;
+        }
         IItemAction action = stack.get(QuickDataComponents.ITEM_ACTION);
         if (action != null) {
             action.onItemAction(player, key);
