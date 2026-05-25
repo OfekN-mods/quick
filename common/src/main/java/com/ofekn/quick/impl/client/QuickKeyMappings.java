@@ -16,6 +16,7 @@ public final class QuickKeyMappings {
 	private static QuickKeyMappings instance;
 	private final KeyMapping.Category category;
 	public final KeyMapping wheel;
+	public final KeyMapping containerInteract;
 	public final List<KeyMapping> assignedActions;
 
 	public static void init(Function<Identifier, KeyMapping.Category> regCategory, Consumer<KeyMapping> regKey) {
@@ -32,6 +33,7 @@ public final class QuickKeyMappings {
 	private QuickKeyMappings(Function<Identifier, KeyMapping.Category> regCategory, Consumer<KeyMapping> regKey) {
 		category = regCategory.apply(Quick.id("category"));
 		wheel = key(regKey, "wheel", InputConstants.KEY_V);
+		containerInteract = key(regKey, "container_interact", InputConstants.KEY_V);
 		assignedActions = IntStream.range(0, 10).mapToObj(i -> key(regKey, "action_" + i, InputConstants.KEY_NUMPAD0 + i)).toList();
 	}
 

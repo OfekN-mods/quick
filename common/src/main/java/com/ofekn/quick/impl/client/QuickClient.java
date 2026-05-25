@@ -13,11 +13,14 @@ import com.ofekn.quick.impl.client.layout.ListWheelLayout;
 import com.ofekn.quick.impl.client.layout.RoundWheelLayout;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import com.ofekn.quick.impl.common.network.SBItemAction;
+import com.ofekn.quick.impl.common.slot.ContainerSlotKey;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.Registry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -54,6 +57,14 @@ public final class QuickClient {
             return;
         }
         trigger(minecraft, player);
+    }
+
+    public static boolean onContainerScreenKeyPress(AbstractContainerScreen<?> screen, KeyEvent keyEvent) {
+        if (!QuickKeyMappings.get().containerInteract.matches(keyEvent)) return false;
+        var slot = ((IAbstractContainerScreen) screen).quick$getHoveredSlot();
+        if (slot == null) return false;
+        QuickIntegrations.PLATFORM.sendPacketToServer(new SBItemAction(new ContainerSlotKey(slot.index)));
+        return true;
     }
 
     // TODO remove the code below (old code)
