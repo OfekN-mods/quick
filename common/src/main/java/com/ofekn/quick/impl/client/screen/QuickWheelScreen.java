@@ -20,15 +20,19 @@ public class QuickWheelScreen extends Screen {
 	private static final WheelLayout FALLBACK_LAYOUT = RoundWheelLayout.INSTANCE;
 	private static final Identifier SETTINGS_ICON_SPRITE = Quick.id("widget/settings");
 	private static final Identifier SETTINGS_HOVER_ICON_SPRITE = Quick.id("widget/settings_hover");
-	private static final int SETTINGS_BTN_OFFSET = 8;
-	private static final int SETTINGS_BTN_SIZE = 16;
-	private static final int SETTINGS_BTN_HOVER_SIZE = 32;
+	private static final Identifier CANCEL_ICON_SPRITE = Quick.id("widget/cancel");
+	private static final Identifier CANCEL_HOVER_ICON_SPRITE = Quick.id("widget/cancel_hover");
+	private static final int BTN_OFFSET = 8;
+	private static final int BTN_SIZE = 16;
+	private static final int BTN_HOVER_SIZE = 32;
+
 	private final WheelData data;
 	@Nullable
 	private IWheelOption selectionOption;
 	private int selectionIndex;
 	private int openTick;
 	private boolean hoveringSettings;
+	private boolean hoveringCancel;
 
 	public QuickWheelScreen(WheelData data) {
 		super(Component.empty());
@@ -42,8 +46,15 @@ public class QuickWheelScreen extends Screen {
 	}
 
 	private boolean isOverSettingsButton(double mx, double my) {
-		return 0 <= mx && mx < SETTINGS_BTN_HOVER_SIZE &&
-				0 <= my && my < SETTINGS_BTN_HOVER_SIZE;
+		return 0 <= mx && mx < BTN_HOVER_SIZE &&
+				0 <= my && my < BTN_HOVER_SIZE;
+	}
+
+	private boolean isOverCancelButton(double mx, double my) {
+		double btnRight = width - BTN_OFFSET;
+		double btnLeft = btnRight - BTN_HOVER_SIZE;
+		return btnLeft <= mx && mx < btnRight &&
+				0 <= my && my < BTN_HOVER_SIZE;
 	}
 
 	@Override
@@ -88,7 +99,8 @@ public class QuickWheelScreen extends Screen {
 		super.mouseMoved(mouseX, mouseY);
 
 		hoveringSettings = isOverSettingsButton(mouseX, mouseY);
-		if (hoveringSettings) {
+		hoveringCancel = isOverCancelButton(mouseX, mouseY);
+		if (hoveringSettings || hoveringCancel) {
 			selectionOption = null;
 			selectionIndex = -1;
 			return;
@@ -163,12 +175,16 @@ public class QuickWheelScreen extends Screen {
 			if (hoveringSettings) {
 				graphics.setTooltipForNextFrame(Component.translatable("gui.quick.settings"), mouseX, mouseY);
 			}
+			if (hoveringCancel) {
+				graphics.setTooltipForNextFrame(Component.translatable("gui.quick.cancel"), mouseX, mouseY);
+			}
 			if (selectionOption != null) {
 				selectionOption.extractTooltip(graphics, mouseX, mouseY);
 			}
 		}
 
 		renderSettingsButton(graphics, t);
+		renderCancelButton(graphics, t);
 	}
 
     @Override
@@ -213,8 +229,19 @@ public class QuickWheelScreen extends Screen {
 		graphics.blitSprite(
 				RenderPipelines.GUI_TEXTURED,
 				hoveringSettings ? SETTINGS_HOVER_ICON_SPRITE : SETTINGS_ICON_SPRITE,
-				SETTINGS_BTN_OFFSET, SETTINGS_BTN_OFFSET,
-				SETTINGS_BTN_SIZE, SETTINGS_BTN_SIZE,
+				BTN_OFFSET, BTN_OFFSET,
+				BTN_SIZE, BTN_SIZE,
+				t
+		);
+	}
+
+	private void renderCancelButton(GuiGraphicsExtractor graphics, float t) {
+		int x = width - BTN_OFFSET - BTN_SIZE;
+		graphics.blitSprite(
+				RenderPipelines.GUI_TEXTURED,
+				hoveringCancel ? CANCEL_HOVER_ICON_SPRITE : CANCEL_ICON_SPRITE,
+				x, BTN_OFFSET,
+                BTN_SIZE, BTN_SIZE,
 				t
 		);
 	}

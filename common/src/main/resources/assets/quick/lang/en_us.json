@@ -15,5 +15,6 @@
 
 	"gui.crafting_on_a_stick.selection_wheel.no_tool": "You don't have any tool",
 	"gui.quick.settings.toggle_layout": "Layout %s",
-	"gui.quick.settings": "Settings"
+	"gui.quick.settings": "Settings",
+	"gui.quick.cancel": "Cancel"
 }
