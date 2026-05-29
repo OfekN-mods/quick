@@ -13,5 +13,7 @@
 	"key.quick.action_8": "Quick Action 8",
 	"key.quick.action_9": "Quick Action 9",
 
-	"gui.crafting_on_a_stick.selection_wheel.no_tool": "You don't have any tool"
+	"gui.crafting_on_a_stick.selection_wheel.no_tool": "You don't have any tool",
+	"gui.quick.settings.toggle_layout": "Layout %s",
+	"gui.quick.settings": "Settings"
 }

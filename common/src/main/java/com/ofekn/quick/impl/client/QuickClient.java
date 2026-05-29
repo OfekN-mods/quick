@@ -33,9 +33,9 @@ public final class QuickClient {
 
     public static void init() {
         var layoutRegistrar = QuickIntegrations.PLATFORM.createRegistrar(QuickClientRegistry.WHEEL_LAYOUT);
-        layoutRegistrar.register("round", () -> ListWheelLayout.INSTANCE);
+        layoutRegistrar.register("round", () -> RoundWheelLayout.INSTANCE);
 //        layoutRegistrar.register("polygonal", () -> PolygonalWheelLayout.INSTANCE);
-        layoutRegistrar.register("list", () -> RoundWheelLayout.INSTANCE);
+        layoutRegistrar.register("list", () -> ListWheelLayout.INSTANCE);
 
     }
 

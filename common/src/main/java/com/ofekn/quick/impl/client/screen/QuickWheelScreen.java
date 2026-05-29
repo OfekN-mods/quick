@@ -1,9 +1,10 @@
-package com.ofekn.quick.impl.client;
+package com.ofekn.quick.impl.client.screen;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.ofekn.quick.api.client.*;
-import com.ofekn.quick.api.common.QuickDataComponents;
+import com.ofekn.quick.impl.client.IGuiGraphicsExtender;
 import com.ofekn.quick.impl.client.layout.RoundWheelLayout;
+import com.ofekn.quick.impl.common.Quick;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -11,21 +12,23 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.Item;
 import org.joml.Matrix3x2fStack;
 import org.joml.Vector2f;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Objects;
-
 public class QuickWheelScreen extends Screen {
 	private static final WheelLayout FALLBACK_LAYOUT = RoundWheelLayout.INSTANCE;
+	private static final Identifier SETTINGS_ICON_SPRITE = Quick.id("widget/settings");
+	private static final Identifier SETTINGS_HOVER_ICON_SPRITE = Quick.id("widget/settings_hover");
+	private static final int SETTINGS_BTN_OFFSET = 8;
+	private static final int SETTINGS_BTN_SIZE = 16;
+	private static final int SETTINGS_BTN_HOVER_SIZE = 32;
 	private final WheelData data;
 	@Nullable
 	private IWheelOption selectionOption;
 	private int selectionIndex;
-	private WheelLayout layout;
 	private int openTick;
+	private boolean hoveringSettings;
 
 	public QuickWheelScreen(WheelData data) {
 		super(Component.empty());
@@ -36,23 +39,12 @@ public class QuickWheelScreen extends Screen {
 		this.selectionOption = initialOptions.isEmpty() ? null : initialOptions.getFirst();
 		this.selectionIndex = 0;
 		this.openTick = 0;
-
-		String layoutStr = QuickIntegrations.CONFIG.getWheelType();
-		Identifier layoutId = Identifier.tryParse(layoutStr);
-		WheelLayout layout = layoutId == null ? null : QuickClientRegistry.WHEEL_LAYOUT.getValue(layoutId);
-		if (layout == null) {
-			this.layout = FALLBACK_LAYOUT;
-			updateConfig();
-		} else {
-			this.layout = layout;
-		}
 	}
 
-    private void updateConfig() {
-		Identifier id = QuickClientRegistry.WHEEL_LAYOUT.getKey(this.layout);
-		Objects.requireNonNull(id);
-		QuickIntegrations.CONFIG.setWheelType(id.toString());
-    }
+	private boolean isOverSettingsButton(double mx, double my) {
+		return 0 <= mx && mx < SETTINGS_BTN_HOVER_SIZE &&
+				0 <= my && my < SETTINGS_BTN_HOVER_SIZE;
+	}
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
@@ -61,13 +53,7 @@ public class QuickWheelScreen extends Screen {
 			return true;
 		}
 		if (event.button() == 1) {
-			int index = QuickClientRegistry.WHEEL_LAYOUT.getId(layout);
-			int newIndex = (index + 1) % QuickClientRegistry.WHEEL_LAYOUT.size();
-			var opt = QuickClientRegistry.WHEEL_LAYOUT.get(newIndex);
-			if (opt.isPresent() && opt.get().isBound()) {
-				this.layout = opt.get().value();
-				updateConfig();
-			}
+			onClose();
 			return true;
 		}
 		return super.mouseReleased(event);
@@ -90,7 +76,9 @@ public class QuickWheelScreen extends Screen {
 
 	private void select() {
 		this.onClose();
-		if (selectionOption != null) {
+		if (hoveringSettings) {
+			this.minecraft.setScreen(new QuickSettingsScreen());
+		} else if (selectionOption != null) {
 			selectionOption.onSelect();
 		}
 	}
@@ -98,6 +86,13 @@ public class QuickWheelScreen extends Screen {
 	@Override
 	public void mouseMoved(double mouseX, double mouseY) {
 		super.mouseMoved(mouseX, mouseY);
+
+		hoveringSettings = isOverSettingsButton(mouseX, mouseY);
+		if (hoveringSettings) {
+			selectionOption = null;
+			selectionIndex = -1;
+			return;
+		}
 
 		float dmx = (float) mouseX - (float) width / 2;
 		float dmy = (float) mouseY - (float) height / 2;
@@ -134,6 +129,7 @@ public class QuickWheelScreen extends Screen {
 		if (numOptions == 0) {
 			int textColor = applyAlpha(0xFFFFFFFF, t);
             graphics.centeredText(font, Component.translatable("gui.crafting_on_a_stick.selection_wheel.no_tool"), (int)centerX, (int)centerY, textColor);
+			renderSettingsButton(graphics, t);
 			return;
 		}
 		float scale = easeScale(t);
@@ -163,9 +159,16 @@ public class QuickWheelScreen extends Screen {
 			}
 		}
 		pos.popMatrix();
-		if (t > 0.99f && selectionOption != null) { // Only show tooltip when mostly faded in
-			selectionOption.extractTooltip(graphics, mouseX, mouseY);
+		if (t > 0.99f) { // Only show tooltip when mostly faded in
+			if (hoveringSettings) {
+				graphics.setTooltipForNextFrame(Component.translatable("gui.quick.settings"), mouseX, mouseY);
+			}
+			if (selectionOption != null) {
+				selectionOption.extractTooltip(graphics, mouseX, mouseY);
+			}
 		}
+
+		renderSettingsButton(graphics, t);
 	}
 
     @Override
@@ -197,7 +200,23 @@ public class QuickWheelScreen extends Screen {
 	}
 
 	private WheelPolygon[] getLayout(int numOptions) {
+		String layoutStr = QuickIntegrations.CONFIG.getWheelType();
+		Identifier layoutId = Identifier.tryParse(layoutStr);
+		WheelLayout layout = layoutId == null ? null : QuickClientRegistry.WHEEL_LAYOUT.getValue(layoutId);
+		if (layout == null) {
+			layout = FALLBACK_LAYOUT;
+		}
 		return layout.polygons(numOptions);
+	}
+
+	private void renderSettingsButton(GuiGraphicsExtractor graphics, float t) {
+		graphics.blitSprite(
+				RenderPipelines.GUI_TEXTURED,
+				hoveringSettings ? SETTINGS_HOVER_ICON_SPRITE : SETTINGS_ICON_SPRITE,
+				SETTINGS_BTN_OFFSET, SETTINGS_BTN_OFFSET,
+				SETTINGS_BTN_SIZE, SETTINGS_BTN_SIZE,
+				t
+		);
 	}
 
 	private static void fill(WheelPolygon polygon, GuiGraphicsExtractor guiGraphics, RenderPipeline pipeline, float z, int color) {
