@@ -17,5 +17,12 @@
 	"gui.quick.settings.toggle_layout": "Layout %s",
 	"gui.quick.settings": "Settings",
 	"gui.quick.cancel": "Cancel",
-	"gui.quick.settings.set_action": "Set action %s"
+	"gui.quick.settings.set_action": "Set action %s",
+
+	"gui.quick.edit_action": "Edit Action %s",
+	"gui.quick.edit_action.by_id": "By ID",
+	"gui.quick.edit_action.by_name": "By Name",
+	"gui.quick.edit_action.by_slot": "By Slot",
+	"gui.quick.edit_action.save": "Save",
+	"gui.quick.edit_action.clear": "Clear"
 }

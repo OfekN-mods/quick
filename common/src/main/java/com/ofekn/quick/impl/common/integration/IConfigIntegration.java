@@ -6,8 +6,13 @@ public interface IConfigIntegration {
 
     boolean getStoreItems();
 
+    // Format: "id:minecraft:stick", "name:Stick", "slot:9", or "" if unset
+    default String getActionAssignment(int index) { return ""; }
+    default void setActionAssignment(int index, String assignment) {}
+
     IConfigIntegration DEFAULT = new IConfigIntegration() {
         String wheelType = "round";
+        final String[] actions = new String[10];
 
         @Override
         public String getWheelType() {
@@ -22,6 +27,17 @@ public interface IConfigIntegration {
         @Override
         public boolean getStoreItems() {
             return true;
+        }
+
+        @Override
+        public String getActionAssignment(int index) {
+            String v = actions[index];
+            return v != null ? v : "";
+        }
+
+        @Override
+        public void setActionAssignment(int index, String assignment) {
+            actions[index] = assignment;
         }
     };
 }

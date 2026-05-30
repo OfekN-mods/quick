@@ -77,6 +77,20 @@ public enum GsonConfigIntegration implements IConfigIntegration {
         return commonData.storeItems;
     }
 
+    @Override
+    public String getActionAssignment(int index) {
+        if (index < 0 || index >= clientData.actionAssignments.length) return "";
+        String v = clientData.actionAssignments[index];
+        return v != null ? v : "";
+    }
+
+    @Override
+    public void setActionAssignment(int index, String assignment) {
+        if (index < 0 || index >= clientData.actionAssignments.length) return;
+        clientData.actionAssignments[index] = assignment;
+        save(CLIENT_PATH, clientData);
+    }
+
     private static class CommonData {
         /** Whether to store items in the crafting stations when they are closed */
         boolean storeItems = true;
@@ -85,5 +99,6 @@ public enum GsonConfigIntegration implements IConfigIntegration {
     private static class ClientData {
         /** The kind of wheel to use, currently "round" or "list" */
         String wheelType = "round";
+        String[] actionAssignments = new String[10];
     }
 }

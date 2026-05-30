@@ -19,6 +19,10 @@ public enum NeoForgeConfigIntegration implements IConfigIntegration {
     private final ModConfigSpec.ConfigValue<String> wheelType = clientBuilder
             .comment("The kind of wheel to use, currently there are only \"round\" and \"list\"")
             .define("wheelType", "round");
+    @SuppressWarnings("unchecked")
+    private final ModConfigSpec.ConfigValue<String>[] actionAssignments = java.util.stream.IntStream.range(0, 10)
+            .mapToObj(i -> clientBuilder.define("action_" + i, ""))
+            .<ModConfigSpec.ConfigValue<String>>toArray(ModConfigSpec.ConfigValue[]::new);
     private final ModConfigSpec clientSpec = clientBuilder.build();
 
     @ApiStatus.Internal
@@ -41,5 +45,19 @@ public enum NeoForgeConfigIntegration implements IConfigIntegration {
     @Override
     public boolean getStoreItems() {
         return this.storeItems.get();
+    }
+
+    @Override
+    public String getActionAssignment(int index) {
+        if (index < 0 || index >= actionAssignments.length) return "";
+        String v = actionAssignments[index].get();
+        return v != null ? v : "";
+    }
+
+    @Override
+    public void setActionAssignment(int index, String assignment) {
+        if (index < 0 || index >= actionAssignments.length) return;
+        actionAssignments[index].set(assignment);
+        clientSpec.save();
     }
 }

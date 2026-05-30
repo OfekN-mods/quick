@@ -5,6 +5,7 @@ import com.ofekn.quick.api.client.WheelLayout;
 import com.ofekn.quick.impl.client.QuickKeyMappings;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -55,7 +56,7 @@ public class QuickSettingsScreen extends Screen {
     }
 
     private static void editAction(int index) {
-        // TODO implement
+        Minecraft.getInstance().setScreen(new QuickEditActionScreen(index));
     }
 
     private static Component getToggleLayoutButtonText() {
