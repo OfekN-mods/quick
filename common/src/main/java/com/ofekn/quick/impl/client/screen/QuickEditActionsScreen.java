@@ -6,7 +6,6 @@ import com.ofekn.quick.api.common.ISlotKey;
 import com.ofekn.quick.impl.client.ActionBinding;
 import com.ofekn.quick.impl.client.QuickClient;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
-import com.ofekn.quick.impl.common.slot.ContainerSlotKey;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -17,12 +16,13 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 
 public class QuickEditActionsScreen extends Screen {
@@ -37,19 +37,15 @@ public class QuickEditActionsScreen extends Screen {
     private final ActionBinding[] pendingActions = new ActionBinding[10];
     private int selectedTab = 0;
 
-    // Layout fields computed in init
     private int contentX;
-
-    @Nullable private ItemStack selectedStack;
-    @Nullable private ISlotKey selectedKey;
-    @Nullable private String selectedMethod;
-
     private List<ISlotKey> options = List.of();
     @Nullable private Player player;
 
     private final Button[] tabButtons = new Button[10];
     private ItemSelectionList itemList;
-    private Button byIdButton, byNameButton, bySlotButton;
+    // Pre-allocated kind buttons (up to 4), rebuilt in buildEditPanel, shown/positioned in rebuildKindButtons
+    private final Button[] kindButtons = new Button[4];
+    private final @Nullable ActionBinding[] kindBindingSlots = new ActionBinding[4];
 
     public QuickEditActionsScreen() {
         super(Component.translatable("gui.quick.edit_actions"));
@@ -65,11 +61,9 @@ public class QuickEditActionsScreen extends Screen {
 
     @Override
     protected void init() {
-        encodeCurrentTab();
         super.init();
         player = minecraft.player;
         options = player != null ? QuickClient.getOptions(player) : List.of();
-
         contentX = (width - CONTENT_W) / 2;
         buildTabButtons();
         buildEditPanel();
@@ -94,35 +88,27 @@ public class QuickEditActionsScreen extends Screen {
         int listY = PADDING + BTN_H + TAB_BOTTOM_GAP;
         int listH = height - 2 * PADDING - 3 * BTN_H - 2 * GAP - TAB_BOTTOM_GAP;
         itemList = addRenderableWidget(
-            new ItemSelectionList(
-                    minecraft,
-                    contentX, CONTENT_W,
-                    listH, listY,
-                    ITEM_H,
-                    options,
-                    player
-            )
+            new ItemSelectionList(minecraft, contentX, CONTENT_W, listH, listY, ITEM_H, options, player)
         );
 
         int methodY = height - PADDING - 2 * BTN_H - GAP;
-        int methodWidth = (CONTENT_W - 2 * GAP) / 3;
-
-        byIdButton = addRenderableWidget(
-            Button.builder(methodLabel("gui.quick.edit_action.by_id", "id"), _ -> selectMethod("id"))
-                .pos(contentX, methodY).size(methodWidth, BTN_H).build()
-        );
-        byNameButton = addRenderableWidget(
-            Button.builder(methodLabel("gui.quick.edit_action.by_name", "name"), _ -> selectMethod("name"))
-                .pos(contentX + (methodWidth + GAP), methodY).size(methodWidth, BTN_H).build()
-        );
-        bySlotButton = addRenderableWidget(
-            Button.builder(methodLabel("gui.quick.edit_action.by_slot", "slot"), _ -> selectMethod("slot"))
-                .pos(contentX + 2 * (methodWidth + GAP), methodY).size(methodWidth, BTN_H).build()
-        );
+        for (int i = 0; i < 4; i++) {
+            final int fi = i;
+            kindButtons[i] = addRenderableWidget(
+                Button.builder(Component.empty(), _ -> {
+                    var binding = kindBindingSlots[fi];
+                    if (binding != null) {
+                        pendingActions[selectedTab] = binding;
+                        refreshKindButtonLabels();
+                    }
+                }).pos(0, methodY).size(1, BTN_H).build()
+            );
+            kindButtons[i].visible = false;
+            kindBindingSlots[i] = null;
+        }
 
         int finalY = height - PADDING - BTN_H;
         int finalWidth = (CONTENT_W - GAP) / 2;
-
         addRenderableWidget(
             Button.builder(Component.translatable("gui.quick.cancel"), _ -> cancel())
                 .pos(contentX, finalY).size(finalWidth, BTN_H).build()
@@ -134,7 +120,6 @@ public class QuickEditActionsScreen extends Screen {
     }
 
     private void selectTab(int newTab) {
-        encodeCurrentTab();
         selectedTab = newTab;
         clearWidgets();
         buildTabButtons();
@@ -143,86 +128,76 @@ public class QuickEditActionsScreen extends Screen {
     }
 
     private void loadTabState(int tab) {
-        selectedStack = null;
-        selectedKey = null;
-        selectedMethod = null;
-
-        switch (pendingActions[tab]) {
-            case ActionBinding.NoAction _ -> itemList.selectByKey(null);
-            case ActionBinding.ByName(String name) -> {
-                selectedMethod = "name";
-                for (ISlotKey key : options) {
-                    if (player == null) break;
-                    ItemStack stack = key.get(player);
-                    if (!stack.isEmpty() && stack.getHoverName().getString().equals(name)) {
-                        selectedStack = stack;
-                        selectedKey = key;
-                        break;
-                    }
+        ActionBinding current = pendingActions[tab];
+        for (ItemSelectionList.ItemEntry entry : itemList.children()) {
+            for (ActionBinding binding : entry.bindings.values()) {
+                if (binding.equals(current)) {
+                    itemList.setSelected(entry);
+                    rebuildKindButtons(entry.bindings);
+                    return;
                 }
-                itemList.selectByKey(selectedKey);
-            }
-            case ActionBinding.ById(Identifier id) -> {
-                selectedMethod = "id";
-                for (ISlotKey key : options) {
-                    if (player == null) break;
-                    ItemStack stack = key.get(player);
-                    if (!stack.isEmpty() && stack.is(h -> h.is(id))) {
-                        selectedStack = stack;
-                        selectedKey = key;
-                        break;
-                    }
-                }
-                itemList.selectByKey(selectedKey);
-            }
-            case ActionBinding.BySlot(ISlotKey slotKey) -> {
-                selectedMethod = "slot";
-                selectedKey = slotKey;
-                if (player != null) selectedStack = slotKey.get(player);
-                itemList.selectByKey(selectedKey);
             }
         }
-        refreshMethodButtons();
+        itemList.setSelected(null);
+        rebuildKindButtons(new EnumMap<>(ActionBinding.Type.class));
     }
 
-    private void encodeCurrentTab() {
-        if (selectedStack == null || selectedMethod == null) return;
-        ActionBinding binding = switch (selectedMethod) {
-            case "name" -> new ActionBinding.ByName(selectedStack.getHoverName().getString());
-            case "id" -> selectedStack.typeHolder()
-                    .unwrapKey()
-                    .map(key -> (ActionBinding) new ActionBinding.ById(key.identifier()))
-                    .orElse(ActionBinding.NoAction.INSTANCE);
-            case "slot" -> new ActionBinding.BySlot(selectedKey);
-            default -> throw new IllegalStateException("Unknown method: " + selectedMethod);
+    private void rebuildKindButtons(EnumMap<ActionBinding.Type, ActionBinding> bindings) {
+        for (int i = 0; i < 4; i++) {
+            kindButtons[i].visible = false;
+            kindBindingSlots[i] = null;
+        }
+
+        var bindingEntries = new ArrayList<>(bindings.entrySet());
+        int n = bindingEntries.size();
+        int btnW = (CONTENT_W - Math.max(0, n - 1) * GAP) / n;
+        ActionBinding current = pendingActions[selectedTab];
+
+        for (int i = 0; i < n; i++) {
+            ActionBinding.Type type = bindingEntries.get(i).getKey();
+            ActionBinding binding = bindingEntries.get(i).getValue();
+            kindBindingSlots[i] = binding;
+            kindButtons[i].setMessage(
+                binding.equals(current) ? type.label.copy().withStyle(ChatFormatting.GREEN) : type.label
+            );
+            kindButtons[i].setTooltip(binding instanceof ActionBinding.NoAction ? null : Tooltip.create(Component.literal(binding.toString())));
+            kindButtons[i].setX(contentX + i * (btnW + GAP));
+            kindButtons[i].setWidth(btnW);
+            kindButtons[i].visible = true;
+        }
+    }
+
+    private void refreshKindButtonLabels() {
+        ItemSelectionList.ItemEntry entry = itemList.getSelected();
+        if (entry == null) return;
+        ActionBinding current = pendingActions[selectedTab];
+        var bindingEntries = new ArrayList<>(entry.bindings.entrySet());
+        for (int i = 0; i < bindingEntries.size() && kindButtons[i].visible; i++) {
+            ActionBinding.Type type = bindingEntries.get(i).getKey();
+            ActionBinding binding = bindingEntries.get(i).getValue();
+            kindButtons[i].setMessage(
+                binding.equals(current) ? type.label.copy().withStyle(ChatFormatting.GREEN) : type.label
+            );
+        }
+    }
+
+    private static ActionBinding.Type kindOf(ActionBinding binding) {
+        return switch (binding) {
+            case ActionBinding.NoAction _ -> ActionBinding.Type.NO_ACTION;
+            case ActionBinding.ById _     -> ActionBinding.Type.BY_ID;
+            case ActionBinding.ByName _   -> ActionBinding.Type.BY_NAME;
+            case ActionBinding.BySlot _   -> ActionBinding.Type.BY_SLOT;
         };
-        pendingActions[selectedTab] = binding;
     }
 
-    private void selectMethod(String method) {
-        selectedMethod = method;
-        refreshMethodButtons();
-    }
-
-    private void refreshMethodButtons() {
-        byIdButton.setMessage(methodLabel("gui.quick.edit_action.by_id", "id"));
-        byNameButton.setMessage(methodLabel("gui.quick.edit_action.by_name", "name"));
-        bySlotButton.setMessage(methodLabel("gui.quick.edit_action.by_slot", "slot"));
-    }
-
-    private Component methodLabel(String key, String method) {
-        Component base = Component.translatable(key);
-        return method.equals(selectedMethod) ? base.copy().withStyle(ChatFormatting.GREEN) : base;
-    }
-
-    void onItemSelected(ItemStack stack, ISlotKey key) {
-        selectedStack = stack;
-        selectedKey = key;
-        refreshMethodButtons();
+    void onEntrySelected(ItemSelectionList.ItemEntry entry) {
+        ActionBinding.Type currentType = kindOf(pendingActions[selectedTab]);
+        ActionBinding preferred = entry.bindings.get(currentType);
+        pendingActions[selectedTab] = preferred != null ? preferred : entry.bindings.values().iterator().next();
+        rebuildKindButtons(entry.bindings);
     }
 
     private void saveAll() {
-        encodeCurrentTab();
         for (int i = 0; i < 10; i++) {
             QuickIntegrations.CONFIG.setActionAssignment(i, serializeBinding(pendingActions[i]));
         }
@@ -233,18 +208,8 @@ public class QuickEditActionsScreen extends Screen {
         minecraft.setScreen(new QuickSettingsScreen());
     }
 
-    private void clearTab() {
-        pendingActions[selectedTab] = ActionBinding.NoAction.INSTANCE;
-        selectedStack = null;
-        selectedKey = null;
-        selectedMethod = null;
-        itemList.selectByKey(null);
-        bySlotButton.active = false;
-        refreshMethodButtons();
-    }
-
     private static ActionBinding deserializeBinding(String s) {
-        if (s == null || s.isEmpty()) return ActionBinding.NoAction.INSTANCE;
+        if (s.isEmpty()) return ActionBinding.NoAction.INSTANCE;
         try {
             return ActionBinding.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(s))
                     .result()
@@ -289,14 +254,22 @@ public class QuickEditActionsScreen extends Screen {
             super(mc, listWidth, height, top, itemHeight);
             this.listWidth = listWidth;
             this.setX(listX);
-            addEntry(new ItemEntry(new ItemStack(Items.BARRIER), null));
-            if (player != null) {
-                for (ISlotKey key : keys) {
-                    ItemStack stack = key.get(player);
-                    if (!stack.isEmpty()) {
-                        addEntry(new ItemEntry(stack, key));
-                    }
-                }
+
+            EnumMap<ActionBinding.Type, ActionBinding> noActionMap = new EnumMap<>(ActionBinding.Type.class);
+            noActionMap.put(ActionBinding.Type.NO_ACTION, ActionBinding.NoAction.INSTANCE);
+            addEntry(new ItemEntry(new ItemStack(Items.BARRIER), noActionMap));
+
+            if (player == null) {
+                return;
+            }
+            for (ISlotKey key : keys) {
+                ItemStack stack = key.get(player);
+                if (stack.isEmpty()) continue;
+                EnumMap<ActionBinding.Type, ActionBinding> bindings = new EnumMap<>(ActionBinding.Type.class);
+                bindings.put(ActionBinding.Type.BY_NAME, ActionBinding.ByName.of(stack));
+                ActionBinding.ById.of(stack).ifPresent(b -> bindings.put(ActionBinding.Type.BY_ID, b));
+                bindings.put(ActionBinding.Type.BY_SLOT, new ActionBinding.BySlot(key));
+                addEntry(new ItemEntry(stack, bindings));
             }
         }
 
@@ -305,27 +278,19 @@ public class QuickEditActionsScreen extends Screen {
             return listWidth - 12;
         }
 
-        void selectByKey(@Nullable ISlotKey key) {
-            for (ItemEntry entry : children()) {
-                if (key == null ? entry.key == null : key.equals(entry.key)) {
-                    setSelected(entry);
-                    return;
-                }
-            }
-            setSelected(null);
-        }
-
         class ItemEntry extends ObjectSelectionList.Entry<ItemEntry> {
-            private final ItemStack stack;
-            private final @Nullable ISlotKey key;
+            final ItemStack displayStack;
+            final EnumMap<ActionBinding.Type, ActionBinding> bindings;
 
-            ItemEntry(ItemStack stack, @Nullable ISlotKey key) {
-                this.stack = stack;
-                this.key = key;
+            ItemEntry(ItemStack displayStack, EnumMap<ActionBinding.Type, ActionBinding> bindings) {
+                this.displayStack = displayStack;
+                this.bindings = bindings;
             }
 
             private Component label() {
-                return key == null ? Component.translatable("gui.quick.no_action") : stack.getHoverName();
+                return bindings.containsKey(ActionBinding.Type.NO_ACTION)
+                    ? Component.translatable("gui.quick.no_action")
+                    : displayStack.getHoverName();
             }
 
             @Override
@@ -337,19 +302,15 @@ public class QuickEditActionsScreen extends Screen {
             public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovering, float partialTick) {
                 boolean selected = ItemSelectionList.this.getSelected() == this;
                 int textColor = (hovering || selected) ? 0xFFFFFFFF : 0xFFAAAAAA;
-                graphics.fakeItem(stack, getContentX(), getContentY());
+                graphics.fakeItem(displayStack, getContentX(), getContentY());
                 graphics.text(font, label(), getContentX() + 18, getContentYMiddle() - 4, textColor);
             }
 
             @Override
             public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
                 if (event.button() == 0) {
-                    if (key == null) {
-                        clearTab();
-                    } else {
-                        ItemSelectionList.this.setSelected(this);
-                        onItemSelected(stack, key);
-                    }
+                    ItemSelectionList.this.setSelected(this);
+                    onEntrySelected(this);
                     return true;
                 }
                 return false;

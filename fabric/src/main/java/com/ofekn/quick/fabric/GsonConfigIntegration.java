@@ -6,6 +6,7 @@ import com.mojang.logging.LogUtils;
 import com.ofekn.quick.impl.common.integration.IConfigIntegration;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -99,6 +100,6 @@ public enum GsonConfigIntegration implements IConfigIntegration {
     private static class ClientData {
         /** The kind of wheel to use, currently "round" or "list" */
         String wheelType = "round";
-        String[] actionAssignments = new String[10];
+        @Nullable String[] actionAssignments = new String[10];
     }
 }
