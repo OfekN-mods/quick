@@ -14,6 +14,7 @@ import com.ofekn.quick.impl.client.layout.RoundWheelLayout;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import com.ofekn.quick.impl.common.network.SBItemAction;
 import com.ofekn.quick.impl.common.slot.ContainerSlotKey;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Registry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -42,6 +43,7 @@ public final class QuickClient {
     @ApiStatus.Internal
     public static void tick(Minecraft minecraft) {
         openWheelIfClicked(minecraft);
+        runQuickActionIfClicked(minecraft);
     }
 
     private static void openWheelIfClicked(Minecraft minecraft) {
@@ -56,6 +58,19 @@ public final class QuickClient {
             return;
         }
         trigger(minecraft, player);
+    }
+
+    private static void runQuickActionIfClicked(Minecraft minecraft) {
+        LocalPlayer player = minecraft.player;
+        if (player == null) {
+            return;
+        }
+        var actionKeys = QuickKeyMappings.get().assignedActions;
+        for (int i = 0; i < actionKeys.size(); i++) {
+            while (actionKeys.get(i).consumeClick()) {
+                ActionBinding.deserializeFromConfig(i).PerformAction(player);
+            }
+        }
     }
 
     public static boolean interactHoveredSlot(AbstractContainerScreen<?> screen) {

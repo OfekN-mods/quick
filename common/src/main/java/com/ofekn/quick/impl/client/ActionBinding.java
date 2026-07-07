@@ -1,6 +1,8 @@
 package com.ofekn.quick.impl.client;
 
+import com.google.gson.JsonParser;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ofekn.quick.api.common.ISlotKey;
@@ -17,12 +19,33 @@ import net.minecraft.world.item.Items;
 
 import java.util.Optional;
 
+// TODO expose to API
 public sealed interface ActionBinding {
     Codec<ActionBinding> CODEC = Type.CODEC.dispatch(
             "type",
             ActionBinding::type,
             type -> type.codec
     );
+
+    static ActionBinding deserializeFromConfig(int i) {
+        String str = QuickIntegrations.CONFIG.getActionAssignment(i);
+        if (str.isEmpty()) return ActionBinding.NoAction.INSTANCE;
+        try {
+            return ActionBinding.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(str))
+                    .result()
+                    .orElse(ActionBinding.NoAction.INSTANCE);
+        } catch (Exception e) {
+            return ActionBinding.NoAction.INSTANCE;
+        }
+    }
+
+    static void serializeToConfig(int i, ActionBinding binding) {
+        String str = ActionBinding.CODEC.encodeStart(JsonOps.INSTANCE, binding)
+                .result()
+                .map(Object::toString)
+                .orElse("");
+        QuickIntegrations.CONFIG.setActionAssignment(i, str);
+    }
 
     ItemStack getIcon(LocalPlayer player);
     void PerformAction(LocalPlayer player);

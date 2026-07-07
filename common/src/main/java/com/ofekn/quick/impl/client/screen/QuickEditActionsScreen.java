@@ -50,7 +50,7 @@ public class QuickEditActionsScreen extends Screen {
     public QuickEditActionsScreen() {
         super(Component.translatable("gui.quick.edit_actions"));
         for (int i = 0; i < 10; i++) {
-            pendingActions[i] = deserializeBinding(QuickIntegrations.CONFIG.getActionAssignment(i));
+            pendingActions[i] = ActionBinding.deserializeFromConfig(i);
         }
     }
 
@@ -150,6 +150,9 @@ public class QuickEditActionsScreen extends Screen {
 
         var bindingEntries = new ArrayList<>(bindings.entrySet());
         int n = bindingEntries.size();
+        if (n == 0) {
+            return;
+        }
         int btnW = (CONTENT_W - Math.max(0, n - 1) * GAP) / n;
         ActionBinding current = pendingActions[selectedTab];
 
@@ -190,31 +193,13 @@ public class QuickEditActionsScreen extends Screen {
 
     private void saveAll() {
         for (int i = 0; i < 10; i++) {
-            QuickIntegrations.CONFIG.setActionAssignment(i, serializeBinding(pendingActions[i]));
+            ActionBinding.serializeToConfig(i, pendingActions[i]);
         }
         minecraft.setScreen(new QuickSettingsScreen());
     }
 
     private void cancel() {
         minecraft.setScreen(new QuickSettingsScreen());
-    }
-
-    private static ActionBinding deserializeBinding(String s) {
-        if (s.isEmpty()) return ActionBinding.NoAction.INSTANCE;
-        try {
-            return ActionBinding.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(s))
-                    .result()
-                    .orElse(ActionBinding.NoAction.INSTANCE);
-        } catch (Exception e) {
-            return ActionBinding.NoAction.INSTANCE;
-        }
-    }
-
-    private static String serializeBinding(ActionBinding binding) {
-        return ActionBinding.CODEC.encodeStart(JsonOps.INSTANCE, binding)
-                .result()
-                .map(Object::toString)
-                .orElse("");
     }
 
     @Override
