@@ -24,7 +24,7 @@
 	"gui.quick.edit_action.by_name": "By Name",
 	"gui.quick.edit_action.by_slot": "By Slot",
 	"gui.quick.edit_action.save": "Save",
-	"gui.quick.edit_action.clear": "Clear",
+	"gui.quick.no_action": "No Action",
 
 	"gui.quick.edit_actions": "Edit Actions",
 	"gui.quick.edit_actions.tab": "Action %s",

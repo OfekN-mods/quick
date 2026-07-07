@@ -1,5 +1,8 @@
 package com.ofekn.quick.neoforge;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ofekn.quick.api.common.ISlotKey;
 import com.ofekn.quick.api.common.SlotType;
 import io.netty.buffer.ByteBuf;
@@ -14,12 +17,18 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import java.util.Optional;
 
 public record CuriosSlotKey(String identifier, int index) implements ISlotKey {
+    public static final MapCodec<CuriosSlotKey> CODEC = RecordCodecBuilder.mapCodec(instance ->
+            instance.group(
+                    Codec.STRING.fieldOf("identifier").forGetter(CuriosSlotKey::identifier),
+                    Codec.INT.fieldOf("index").forGetter(CuriosSlotKey::index)
+            ).apply(instance, CuriosSlotKey::new)
+    );
     public static final StreamCodec<ByteBuf, CuriosSlotKey> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, CuriosSlotKey::identifier,
             ByteBufCodecs.VAR_INT, CuriosSlotKey::index,
             CuriosSlotKey::new
     );
-    public static final SlotType<CuriosSlotKey> TYPE = new SlotType<>(STREAM_CODEC);
+    public static final SlotType<CuriosSlotKey> TYPE = new SlotType<>(CODEC, STREAM_CODEC);
 
     @Override
     public SlotType<?> type() {

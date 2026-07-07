@@ -1,5 +1,8 @@
 package com.ofekn.quick.impl.common.slot;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ofekn.quick.api.common.ISlotKey;
 import com.ofekn.quick.api.common.SlotType;
 import io.netty.buffer.ByteBuf;
@@ -9,11 +12,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public record InventorySlotKey(int index) implements ISlotKey {
+    public static final MapCodec<InventorySlotKey> CODEC = RecordCodecBuilder.mapCodec(instance ->
+            instance.group(
+                    Codec.INT.fieldOf("index").forGetter(InventorySlotKey::index)
+            ).apply(instance, InventorySlotKey::new)
+    );
     public static final StreamCodec<ByteBuf, InventorySlotKey> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, InventorySlotKey::index,
             InventorySlotKey::new
     );
-    public static final SlotType<InventorySlotKey> TYPE = new SlotType<>(STREAM_CODEC);
+    public static final SlotType<InventorySlotKey> TYPE = new SlotType<>(CODEC, STREAM_CODEC);
 
     public InventorySlotKey {
         if (index < 0) {

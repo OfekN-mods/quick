@@ -1,5 +1,6 @@
 package com.ofekn.quick.impl.common.slot;
 
+import com.mojang.serialization.MapCodec;
 import com.ofekn.quick.api.common.ISlotKey;
 import com.ofekn.quick.api.common.SlotType;
 import io.netty.buffer.ByteBuf;
@@ -10,8 +11,9 @@ import net.minecraft.world.item.ItemStack;
 public enum EmptySlotKey implements ISlotKey {
     INSTANCE;
 
+    public static final MapCodec<EmptySlotKey> CODEC = MapCodec.unit(INSTANCE);
     public static final StreamCodec<ByteBuf, EmptySlotKey> STREAM_CODEC = StreamCodec.unit(INSTANCE);
-    public static final SlotType<EmptySlotKey> TYPE = new SlotType<>(STREAM_CODEC);
+    public static final SlotType<EmptySlotKey> TYPE = new SlotType<>(CODEC, STREAM_CODEC);
 
     @Override
     public SlotType<?> type() {
