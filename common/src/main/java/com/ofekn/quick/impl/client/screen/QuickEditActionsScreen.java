@@ -181,17 +181,8 @@ public class QuickEditActionsScreen extends Screen {
         }
     }
 
-    private static ActionBinding.Type kindOf(ActionBinding binding) {
-        return switch (binding) {
-            case ActionBinding.NoAction _ -> ActionBinding.Type.NO_ACTION;
-            case ActionBinding.ById _     -> ActionBinding.Type.BY_ID;
-            case ActionBinding.ByName _   -> ActionBinding.Type.BY_NAME;
-            case ActionBinding.BySlot _   -> ActionBinding.Type.BY_SLOT;
-        };
-    }
-
     void onEntrySelected(ItemSelectionList.ItemEntry entry) {
-        ActionBinding.Type currentType = kindOf(pendingActions[selectedTab]);
+        ActionBinding.Type currentType = pendingActions[selectedTab].type();
         ActionBinding preferred = entry.bindings.get(currentType);
         pendingActions[selectedTab] = preferred != null ? preferred : entry.bindings.values().iterator().next();
         rebuildKindButtons(entry.bindings);

@@ -20,13 +20,13 @@ import java.util.Optional;
 public sealed interface ActionBinding {
     Codec<ActionBinding> CODEC = Type.CODEC.dispatch(
             "type",
-            ActionBinding::kind,
+            ActionBinding::type,
             type -> type.codec
     );
 
     ItemStack getIcon(LocalPlayer player);
     void PerformAction(LocalPlayer player);
-    Type kind();
+    Type type();
 
     enum Type implements StringRepresentable {
         NO_ACTION(NoAction.MAP_CODEC, Component.translatable("gui.quick.no_action")),
@@ -64,7 +64,7 @@ public sealed interface ActionBinding {
         public void PerformAction(LocalPlayer player) {}
 
         @Override
-        public Type kind() {
+        public Type type() {
             return Type.NO_ACTION;
         }
     }
@@ -89,7 +89,7 @@ public sealed interface ActionBinding {
         }
 
         @Override
-        public Type kind() {
+        public Type type() {
             return Type.BY_NAME;
         }
 
@@ -130,7 +130,7 @@ public sealed interface ActionBinding {
         }
 
         @Override
-        public Type kind() {
+        public Type type() {
             return Type.BY_ID;
         }
 
@@ -160,7 +160,7 @@ public sealed interface ActionBinding {
         }
 
         @Override
-        public Type kind() {
+        public Type type() {
             return Type.BY_SLOT;
         }
 
