@@ -2,7 +2,6 @@ package com.ofekn.quick.impl.client.screen;
 
 import com.ofekn.quick.api.client.QuickClientRegistry;
 import com.ofekn.quick.api.client.WheelLayout;
-import com.ofekn.quick.impl.client.QuickKeyMappings;
 import com.ofekn.quick.impl.common.integration.QuickIntegrations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -28,14 +27,7 @@ public class QuickSettingsScreen extends Screen {
     protected void init() {
         super.init();
         addRenderableWidget(Button.builder(getToggleLayoutButtonText(), QuickSettingsScreen::toggleLayout).pos(8, 8).build());
-        var assignedActions = QuickKeyMappings.get().assignedActions;
-        for (int i = 0; i < assignedActions.size(); i++) {
-            String keybindName = assignedActions.get(i).getName();
-            Component keybindComponent = Component.keybind(keybindName);
-            Component buttonComponent = Component.translatable("gui.quick.settings.set_action", keybindComponent);
-            final int finalI = i;
-            addRenderableWidget(Button.builder(buttonComponent, _ -> editAction(finalI)).pos(8, 8 + 28 + 28 * i).build());
-        }
+        addRenderableWidget(Button.builder(Component.translatable("gui.quick.edit_actions"), _ -> editActions()).pos(8, 36).build());
     }
 
     private static void toggleLayout(Button button) {
@@ -55,8 +47,8 @@ public class QuickSettingsScreen extends Screen {
         button.setMessage(getToggleLayoutButtonText());
     }
 
-    private static void editAction(int index) {
-        Minecraft.getInstance().setScreen(new QuickEditActionScreen(index));
+    private static void editActions() {
+        Minecraft.getInstance().setScreen(new QuickEditActionsScreen());
     }
 
     private static Component getToggleLayoutButtonText() {
